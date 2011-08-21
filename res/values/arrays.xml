@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string-array name="currencies">
+        <item>CHF</item>
+        <item>EUR</item>
+        <item>GBP</item>
+        <item>HUF</item>
+        <item>JPY</item>
+        <item>USD</item>
+    </string-array>
+    
+</resources>
