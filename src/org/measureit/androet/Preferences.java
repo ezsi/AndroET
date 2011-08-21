@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.widget.ListView;
 
+//TODO: add default currency settings
+
 /**
- *
+ * 
  * @author ezsi
  */
 public class Preferences extends PreferenceActivity{
