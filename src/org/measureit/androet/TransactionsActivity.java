@@ -1,6 +1,5 @@
 package org.measureit.androet;
 
-import org.measureit.androet.ui.UIBuilder;
 import org.measureit.androet.util.Constants;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -17,8 +17,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import org.measureit.androet.db.Account;
@@ -26,6 +28,8 @@ import org.measureit.androet.db.Category;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
+
+//TODO: add category grouping
 
 /**
  *
@@ -126,17 +130,37 @@ public class TransactionsActivity extends Activity {
         }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            LinearLayout layout = new LinearLayout(TransactionsActivity.this);
-            layout.setOrientation(LinearLayout.VERTICAL);
-            Transaction o = items.get(position);
-            layout.addView(UIBuilder.createHorizontalView(TransactionsActivity.this, 
-                    TextViewBuilder.text(TransactionsActivity.this, "").build() ));
-            layout.addView( UIBuilder.createHorizontalView(TransactionsActivity.this, 
-                    TextViewBuilder.text(TransactionsActivity.this, o.getCategory().getName()).size(Constants.TEXT_SIZE).color(Color.BLACK).build(),
-                    TextViewBuilder.text(TransactionsActivity.this, account.getCurrency().getSymbol()+" "+o.getAmount()).size(Constants.TEXT_SIZE).color(Color.BLACK).gravity(Gravity.CENTER_HORIZONTAL | Gravity.RIGHT).build()));
-            layout.addView(UIBuilder.createHorizontalView(TransactionsActivity.this, 
-                    TextViewBuilder.text(TransactionsActivity.this, "").build() ));
-            return layout;
+            final TableRow.LayoutParams cellLp = new TableRow.LayoutParams(
+                    ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT, 1.0f);
+            cellLp.setMargins(2, 2, 2, 2);
+            
+            final TableLayout.LayoutParams rowParams = new TableLayout
+                    .LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.FILL_PARENT);
+            rowParams.setMargins(4, 2, 6, 2);
+            
+            Transaction tr = items.get(position);
+            TableLayout tableLayout = new TableLayout(TransactionsActivity.this);
+            
+            TableRow row1 = new TableRow(TransactionsActivity.this);
+            row1.setLayoutParams(rowParams);
+            String dateText = DateFormat.format("MMM", tr.getDate()).toString(); // DateFormat.getDateFormat(TransactionsActivity.this).format(tr.getDate().getTime());
+            row1.addView(TextViewBuilder.text(TransactionsActivity.this, dateText).gravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL).size(Constants.TEXT_SIZE).build());  
+            row1.addView(TextViewBuilder.text(TransactionsActivity.this, "  "+tr.getCategory().getName()).gravity(Gravity.BOTTOM).size(Constants.HEADER_TEXT_SIZE).color(Color.DKGRAY).build());
+            
+            TextView amountTextView = TextViewBuilder.text(TransactionsActivity.this, account.getCurrency().getSymbol()
+                    +" "+tr.getAmount()).size(Constants.TEXT_SIZE+2).color(Color.DKGRAY).gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).build();
+            amountTextView.setLayoutParams(cellLp);
+            row1.addView(amountTextView);
+             
+            TableRow row2 = new TableRow(TransactionsActivity.this);
+            row2.setLayoutParams(rowParams);
+            row2.addView(TextViewBuilder.text(TransactionsActivity.this, tr.getDate().get(Calendar.DATE)+".").gravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL).size(Constants.TEXT_SIZE).build());
+            row2.addView(TextViewBuilder.text(TransactionsActivity.this, "   "+tr.getDescription()).size(Constants.TEXT_SIZE).color(Color.LTGRAY).build());
+            row2.addView(TextViewBuilder.text(TransactionsActivity.this, "").build());
+            
+            tableLayout.addView(row1);
+            tableLayout.addView(row2);
+            return tableLayout;
         }
     }
     

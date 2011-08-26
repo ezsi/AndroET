@@ -2,6 +2,7 @@ package org.measureit.androet;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,11 +17,11 @@ import java.util.Currency;
 import java.util.List;
 import org.measureit.androet.db.Account;
 import org.measureit.androet.db.DatabaseHelper;
-import org.measureit.androet.db.Transaction;
 import org.measureit.androet.util.Cache;
 import org.measureit.androet.ui.UIBuilder;
 import org.measureit.androet.db.UpdateBuilder;
 import org.measureit.androet.db.WhereBuilder;
+import org.measureit.androet.util.Helper;
 
 /**
  *
@@ -32,6 +33,7 @@ public class GroupActivity extends Activity {
     private Account account;
     private ArrayAdapter<Currency> currencyAdapter;
     private EditText accountNameEditBox;
+    private EditText budgetEditBox;
     private Spinner currencySpinner;
     private ListView accountListView;
     private ArrayAdapter accountListAdapter;
@@ -43,10 +45,12 @@ public class GroupActivity extends Activity {
             if(accountName.isEmpty())
                 accountName = "Untitled";
             String currencyCode = ((Currency)currencySpinner.getSelectedItem()).getCurrencyCode();
+            double budget = Helper.parseDouble(budgetEditBox.getText().toString(), 0);
             if(account == null)
-                Account.create(accountName, 0, currencyCode, true);
+                Account.create(accountName, 0, budget, currencyCode, true);
             else{
-                UpdateBuilder.table(Account.TABLE_NAME).column(Account.COL_NAME, accountName).column(Account.COL_CURRENCY, currencyCode)
+                UpdateBuilder.table(Account.TABLE_NAME).column(Account.COL_NAME, accountName)
+                        .column(Account.COL_CURRENCY, currencyCode).column(Account.COL_BUDGET, budget)
                     .where(WhereBuilder.get().where(Account.COL_ID).build(), Integer.toString(account.getId()))
                     .update();
                 Account.clearGroup(account); // no complicated update logic just: drop + add again
@@ -80,6 +84,10 @@ public class GroupActivity extends Activity {
         currencySpinner.setAdapter(currencyAdapter);
         layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Currency", currencySpinner) );
         
+        budgetEditBox = new EditText(this);
+        budgetEditBox.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Monthly budget", budgetEditBox) );
+        
         accountListView = new ListView(this);
         accountListAdapter =  new ArrayAdapter<Account>(this,android.R.layout.simple_list_item_multiple_choice , accountListItems);
         accountListView.setAdapter(accountListAdapter);
@@ -105,6 +113,7 @@ public class GroupActivity extends Activity {
         if(account != null){
             accountNameEditBox.setText(account.getName());
             currencySpinner.setSelection(currencies.indexOf(account.getCurrency()));
+            budgetEditBox.setText(Double.toString(account.getBudget()));
             List<Account> selectedAccounts = Account.list(account.getId());
             for(Account selectedAccount : selectedAccounts)
                 accountListView.setItemChecked(accountListItems.indexOf(selectedAccount), true);

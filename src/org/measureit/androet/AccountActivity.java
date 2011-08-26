@@ -28,6 +28,7 @@ public class AccountActivity extends Activity {
     private ArrayAdapter<Currency> currencyAdapter;
     private EditText accountNameEditBox;
     private EditText initialBalanceEditBox;
+    private EditText budgetEditBox;
     private Spinner currencySpinner;
     private OnClickListener okOnClickListener = new OnClickListener() {
         public void onClick(View arg0) {
@@ -35,12 +36,14 @@ public class AccountActivity extends Activity {
             if(accountName.isEmpty())
                 accountName = "Untitled";
             double initialBalance = Helper.parseDouble(initialBalanceEditBox.getText().toString(), 0);
+            double budget = Helper.parseDouble(budgetEditBox.getText().toString(), 0);
             String currencyCode = ((Currency)currencySpinner.getSelectedItem()).getCurrencyCode();
             if(account == null)
-                Account.create(accountName, initialBalance, currencyCode, false);
+                Account.create(accountName, initialBalance, budget, currencyCode, false);
             else  // edit => update
                 UpdateBuilder.table(Account.TABLE_NAME).column(Account.COL_NAME, accountName)
                     .column(Account.COL_INITIAL_BALANCE, initialBalance).column(Account.COL_CURRENCY, currencyCode)
+                    .column(Account.COL_BUDGET, budget)
                     .where(WhereBuilder.get().where(Account.COL_ID).build(), Integer.toString(account.getId()))
                     .update();
             AccountActivity.this.finish();
@@ -64,6 +67,9 @@ public class AccountActivity extends Activity {
         initialBalanceEditBox = new EditText(this);
         initialBalanceEditBox.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Initial balance", initialBalanceEditBox) );
+        budgetEditBox = new EditText(this);
+        budgetEditBox.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Monthly budget", budgetEditBox) );
 
         currencySpinner = new Spinner(this);
         currencyAdapter = new ArrayAdapter<Currency>(this,android.R.layout.simple_spinner_item , currencies);
@@ -82,6 +88,7 @@ public class AccountActivity extends Activity {
         if(account != null){
             accountNameEditBox.setText(account.getName());
             initialBalanceEditBox.setText(Double.toString(account.getInitialBalance()));
+            budgetEditBox.setText(Double.toString(account.getBudget()));
             currencySpinner.setSelection(currencies.indexOf(account.getCurrency()));
         }
         super.onResume();

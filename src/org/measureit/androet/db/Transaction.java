@@ -118,7 +118,32 @@ public class Transaction implements Serializable{
             return cursor.getDouble(0);
         return -1;
     }
+    
+    /**
+     * Summarize transaction values for the current month.
+     */
+    public static double sum(Account account, int month){
+        Calendar currentMonth = Calendar.getInstance();
+        Helper.resetDate(currentMonth);
+        currentMonth.set(Calendar.MONTH, month-1);
+        
+        Cursor cursor = account.isGroup() ? 
+            DatabaseHelper.getInstance().getWritableDatabase().rawQuery(
+                "SELECT SUM(t." + COL_AMOUNT + ") FROM " + TABLE_NAME + " AS t," + Account.MAP_TABLE_NAME
+                + " AS a WHERE t." + COL_ACCOUNT_ID + " = a." + Account.COL_MAP_ACCOUNT_ID 
+                + " AND a." + Account.COL_MAP_GROUP_ID + " = " + account.getId() 
+                + " AND t." + COL_DATE + " > " + Helper.calendarToSeconds(currentMonth), null)
+            : DatabaseHelper.getInstance().getWritableDatabase().rawQuery(
+                "SELECT SUM("+COL_AMOUNT+") FROM "+TABLE_NAME+" WHERE "+COL_ACCOUNT_ID+"="+account.getId() + " AND " + COL_DATE + " > " + Helper.calendarToSeconds(currentMonth), null);
+        
+        
+        if(cursor.moveToFirst()) 
+            return cursor.getDouble(0);
+        return -1;
+    }
 
+    
+    
     public static double sumGroup(int groupId){
         Cursor cursor = DatabaseHelper.getInstance().getWritableDatabase().rawQuery(
             "SELECT SUM(t." + COL_AMOUNT + ") FROM " + TABLE_NAME + " AS t," + Account.MAP_TABLE_NAME
@@ -140,8 +165,8 @@ public class Transaction implements Serializable{
         Cursor cursor = (account.isGroup()) ? db.rawQuery(
             "SELECT t.* FROM " + TABLE_NAME + " AS t," + Account.MAP_TABLE_NAME
                 + " AS a WHERE t." + COL_ACCOUNT_ID + " = a." + Account.COL_MAP_ACCOUNT_ID 
-                + " AND a." + Account.COL_MAP_GROUP_ID + " = " + account.getId(), null)
-                : db.query(TABLE_NAME, null, COL_ACCOUNT_ID+" = "+accountId, null, null, null, null);
+                + " AND a." + Account.COL_MAP_GROUP_ID + " = " + account.getId() + " ORDER by t." + COL_DATE, null)
+                : db.query(TABLE_NAME, null, COL_ACCOUNT_ID+" = "+accountId, null, null, null, COL_DATE);
         while(cursor.moveToNext()){
             Calendar calendar = Calendar.getInstance();
             final int timeInSec = cursor.getInt(5);

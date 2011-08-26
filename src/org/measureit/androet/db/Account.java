@@ -99,18 +99,18 @@ public class Account implements Serializable{
     }
     
     public static void create(Account account) {
-        create(account.getName(), account.getInitialBalance(), account.getCurrency().getCurrencyCode(), account.isGroup());
+        create(account.getName(), account.getInitialBalance(), account.getBudget(), account.getCurrency().getCurrencyCode(), account.isGroup());
     }
     
-    public static void create(String accountName, double initialBalance, String currency, boolean group) {
-        create(DatabaseHelper.getInstance().getWritableDatabase(), accountName, initialBalance, currency, group);
+    public static void create(String accountName, double initialBalance, double budget, String currency, boolean group) {
+        create(DatabaseHelper.getInstance().getWritableDatabase(), accountName, initialBalance, budget, currency, group);
     }
     
-    public static void create(SQLiteDatabase db, String accountName, double initialBalance, String currency, boolean group) {
+    public static void create(SQLiteDatabase db, String accountName, double initialBalance, double budget, String currency, boolean group) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(COL_NAME, accountName);
         initialValues.put(COL_INITIAL_BALANCE, initialBalance);
-        initialValues.put(COL_BUDGET, 0);
+        initialValues.put(COL_BUDGET, budget);
         initialValues.put(COL_CURRENCY, currency);
         initialValues.put(COL_GROUP, group);
         db.insert(TABLE_NAME, null, initialValues);

@@ -19,5 +19,12 @@ public class Helper {
     public static int calendarToSeconds(Calendar calendar){
         return (int)(calendar.getTimeInMillis()/1000);
     }
+
+    public static void resetDate(Calendar calendar){
+        calendar.set(Calendar.DATE, 0);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+    }
     
 }

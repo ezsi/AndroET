@@ -1,6 +1,5 @@
 package org.measureit.androet;
 
-import org.measureit.androet.ui.UIBuilder;
 import org.measureit.androet.util.Constants;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -19,18 +19,19 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Calendar;
 import org.measureit.androet.db.Account;
 import org.measureit.androet.db.Backup;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 
-//TODO: add date to transaction list
-//TODO: add monthly expense/income sum
-//TODO: show budget line
+// TODO: add currency conversion
 
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();
@@ -55,7 +56,6 @@ public class AccountsActivity extends Activity{
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         context = getApplicationContext();
-        
         listView = new ListView(this);
         listView.setBackgroundColor(Color.WHITE);
         listView.setCacheColorHint(Color.WHITE);
@@ -143,7 +143,6 @@ public class AccountsActivity extends Activity{
         menu.add(Constants.ACCOUNT_EDIT);        
         menu.add(Constants.ACCOUNT_DELETE);
         menu.add(Constants.ACCOUNT_TRANSFER_MONEY);
-        menu.add(Constants.ACCOUNT_SET_BUDGET);
         super.onCreateContextMenu(menu, v, menuInfo);
     }
     
@@ -157,19 +156,46 @@ public class AccountsActivity extends Activity{
         }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            LinearLayout layout = new LinearLayout(AccountsActivity.this);
-            layout.setOrientation(LinearLayout.VERTICAL);
-            Account account = items.get(position);
+            final TableRow.LayoutParams cellLp = new TableRow.LayoutParams(
+                    ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT, 1.0f);
+            cellLp.setMargins(2, 2, 2, 2);
             
-            layout.addView(UIBuilder.createHorizontalView(AccountsActivity.this, 
-                    TextViewBuilder.text(AccountsActivity.this, "").build() ));            
-            int textColor = account.isGroup() ? Color.MAGENTA : Color.BLACK;
-            layout.addView( UIBuilder.createHorizontalView(AccountsActivity.this, 
-                    TextViewBuilder.text(AccountsActivity.this, account.getName()).size(Constants.TEXT_SIZE).color(textColor).build(),
-                    TextViewBuilder.text(AccountsActivity.this, account.getBalanceWithCurrency()).size(Constants.TEXT_SIZE).color(textColor).gravity(Gravity.CENTER_HORIZONTAL | Gravity.RIGHT).build() ));
-            layout.addView(UIBuilder.createHorizontalView(AccountsActivity.this, 
-                    TextViewBuilder.text(AccountsActivity.this, "").build() ));
-            return layout;
+            final TableLayout.LayoutParams rowParams = new TableLayout
+                    .LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.FILL_PARENT);
+            rowParams.setMargins(4, 2, 6, 2);
+            
+            Account account = items.get(position);
+            TableLayout tableLayout = new TableLayout(AccountsActivity.this);
+            int textColor = account.isGroup() ? Color.rgb(50, 220, 220) : Color.BLACK;            
+            TableRow row1 = new TableRow(AccountsActivity.this);
+            row1.setLayoutParams(rowParams);
+            row1.addView(TextViewBuilder.text(AccountsActivity.this, account.getName()).size(Constants.HEADER_TEXT_SIZE).color(Color.DKGRAY).color(textColor).build());
+            TextView amountTextView = TextViewBuilder.text(AccountsActivity.this, account.getCurrency().getSymbol()
+                    +" "+account.getBalance()).size(Constants.TEXT_SIZE+2).color(Color.DKGRAY).gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).color(textColor).build();
+            amountTextView.setLayoutParams(cellLp);
+            row1.addView(amountTextView);
+
+            TableRow row2 = new TableRow(AccountsActivity.this);
+            row2.setLayoutParams(rowParams);
+            double expense = Transaction.sum(account, Calendar.getInstance().get(Calendar.MONTH)+1);
+            StringBuilder expenseSb = new StringBuilder();
+            if(expense < 0)
+                expenseSb.append("Expense: ").append(Double.toString(Math.abs(expense)));
+            else if (expense > 0)
+                expenseSb.append("Income: ").append(Double.toString(Math.abs(expense)));
+            
+            int expenseColor = Color.LTGRAY;
+            if(expense < 0 && account.getBudget() > 0){
+                double availableBudget = account.getBudget()+expense;
+                expenseSb.append(" / ").append(Double.toString(availableBudget));
+                if(availableBudget < 0)
+                    expenseColor = Color.RED;
+            }
+            row2.addView(TextViewBuilder.text(AccountsActivity.this, expenseSb.toString()).color(expenseColor).build());
+            
+            tableLayout.addView(row1);
+            tableLayout.addView(row2);
+            return tableLayout;
         }
     }
     
