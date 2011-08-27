@@ -165,8 +165,8 @@ public class Transaction implements Serializable{
         Cursor cursor = (account.isGroup()) ? db.rawQuery(
             "SELECT t.* FROM " + TABLE_NAME + " AS t," + Account.MAP_TABLE_NAME
                 + " AS a WHERE t." + COL_ACCOUNT_ID + " = a." + Account.COL_MAP_ACCOUNT_ID 
-                + " AND a." + Account.COL_MAP_GROUP_ID + " = " + account.getId() + " ORDER by t." + COL_DATE, null)
-                : db.query(TABLE_NAME, null, COL_ACCOUNT_ID+" = "+accountId, null, null, null, COL_DATE);
+                + " AND a." + Account.COL_MAP_GROUP_ID + " = " + account.getId() + " ORDER by t." + COL_DATE +" DESC", null)
+                : db.query(TABLE_NAME, null, COL_ACCOUNT_ID+" = "+accountId, null, null, null, COL_DATE + " DESC");
         while(cursor.moveToNext()){
             Calendar calendar = Calendar.getInstance();
             final int timeInSec = cursor.getInt(5);
