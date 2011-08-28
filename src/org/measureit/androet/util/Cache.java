@@ -16,6 +16,16 @@ import org.measureit.androet.db.Category;
 public class Cache {
     private static final HashMap<Integer, Category> CATEGORY_CACHE = new HashMap<Integer, Category>();
     
+    private static final Map<String, Currency> CURRENCY_CACHE = new HashMap<String, Currency>();
+    
+    private static final Comparator<Currency> CURRENCY_COMPARATOR = new Comparator<Currency>(){
+
+        public int compare(Currency arg0, Currency arg1) {
+            return arg0.getCurrencyCode().compareTo(arg1.getCurrencyCode());
+        }
+        
+    };
+    
     private static final String[] CURRENCY_CODES = { "JPY", "CNY", "SDG", "RON", "MKD", "MXN", "CAD",
     "ZAR", "AUD", "NOK", "ILS", "ISK", "SYP", "LYD", "UYU", "YER", "CSD",
     "EEK", "THB", "IDR", "LBP", "AED", "BOB", "QAR", "BHD", "HNL", "HRK",
@@ -37,10 +47,24 @@ public class Cache {
     "MRO", "BIF", "CHW", "ZWL", "AWG", "MZN", "CHE", "XOF", "KZT", "BZD",
     "XAG", "KHR", "XAF", "GYD", "AFN", "SOS", "TOP", "AOA", "KPW" };
     
+    public static List<Category> getCategories(){
+        if(CATEGORY_CACHE.isEmpty())
+            reloadCategoryCache();
+        return new ArrayList<Category>(CATEGORY_CACHE.values());
+    }
+    
     public static Category getCategory(int id){
         if(!CATEGORY_CACHE.containsKey(id))
             reloadCategoryCache();
         return CATEGORY_CACHE.get(id);
+    }
+    
+    public static Category getCategoryByName(String categoryName){
+        List<Category> categories = Cache.getCategories();
+        for(Category category : categories)
+            if(category.getName().equals(categoryName))
+                return category;
+        return null;
     }
     
     private static void reloadCategoryCache(){
@@ -49,16 +73,6 @@ public class Cache {
             CATEGORY_CACHE.put(category.getId(), category);
     }
     
-    private static final Map<String, Currency> CURRENCY_CACHE = new HashMap<String, Currency>();
-    
-    private static final Comparator<Currency> CURRENCY_COMPARATOR = new Comparator<Currency>(){
-
-        public int compare(Currency arg0, Currency arg1) {
-            return arg0.getCurrencyCode().compareTo(arg1.getCurrencyCode());
-        }
-        
-    };
-        
     public static Currency getCurrency(String currencyCode){
         if(!CURRENCY_CACHE.containsKey(currencyCode))
             reloadCurrencyCache();
@@ -78,7 +92,6 @@ public class Cache {
         for(String currencyCode : CURRENCY_CODES)
             CURRENCY_CACHE.put(currencyCode, Currency.getInstance(currencyCode));
     }
-    
-    
+       
 }
 

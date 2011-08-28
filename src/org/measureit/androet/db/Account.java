@@ -98,15 +98,15 @@ public class Account implements Serializable{
         return group;
     }
     
-    public static void create(Account account) {
-        create(account.getName(), account.getInitialBalance(), account.getBudget(), account.getCurrency().getCurrencyCode(), account.isGroup());
+    public static void insert(Account account) {
+        insert(account.getName(), account.getInitialBalance(), account.getBudget(), account.getCurrency().getCurrencyCode(), account.isGroup());
     }
     
-    public static void create(String accountName, double initialBalance, double budget, String currency, boolean group) {
-        create(DatabaseHelper.getInstance().getWritableDatabase(), accountName, initialBalance, budget, currency, group);
+    public static void insert(String accountName, double initialBalance, double budget, String currency, boolean group) {
+        insert(DatabaseHelper.getInstance().getWritableDatabase(), accountName, initialBalance, budget, currency, group);
     }
     
-    public static void create(SQLiteDatabase db, String accountName, double initialBalance, double budget, String currency, boolean group) {
+    public static void insert(SQLiteDatabase db, String accountName, double initialBalance, double budget, String currency, boolean group) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(COL_NAME, accountName);
         initialValues.put(COL_INITIAL_BALANCE, initialBalance);
@@ -116,7 +116,7 @@ public class Account implements Serializable{
         db.insert(TABLE_NAME, null, initialValues);
     }
     
-    public static void addGroup(int groupId, int accountId) {
+    public static void insertGroup(int groupId, int accountId) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(COL_MAP_GROUP_ID, groupId);
         initialValues.put(COL_MAP_ACCOUNT_ID, accountId);
@@ -143,7 +143,7 @@ public class Account implements Serializable{
         DatabaseHelper.getInstance().getWritableDatabase().delete(TABLE_NAME, COL_ID + '=' + account.getId(), null);
     }
     
-    public static void clearGroup(Account account){
+    public static void deleteGroup(Account account){
         DatabaseHelper.getInstance().getWritableDatabase().delete(MAP_TABLE_NAME, COL_MAP_GROUP_ID + '=' + account.getId(), null);        
     }
     

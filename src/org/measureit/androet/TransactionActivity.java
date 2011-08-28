@@ -24,6 +24,8 @@ import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.UIBuilder;
 import org.measureit.androet.db.UpdateBuilder;
 import org.measureit.androet.db.WhereBuilder;
+import org.measureit.androet.util.Cache;
+import org.measureit.androet.util.Constants;
 
 /**
  *
@@ -47,7 +49,7 @@ public class TransactionActivity extends Activity {
             final int timeInSec = Helper.calendarToSeconds(calendar);
             int sign = selectedCategory.isExpense() ? -1 : 1;
             if(transaction == null)
-                Transaction.create(accountId, selectedCategory.getId(), sign * Helper.parseDouble(amountEditBox.getText().toString(), 0), descriptionEditBox.getText().toString(), timeInSec);
+                Transaction.insert(accountId, selectedCategory.getId(), sign * Helper.parseDouble(amountEditBox.getText().toString(), 0), descriptionEditBox.getText().toString(), timeInSec);
             else
                 UpdateBuilder.table(Transaction.TABLE_NAME)
                     .column(Transaction.COL_CATEGORY_ID, selectedCategory.getId())
@@ -130,7 +132,7 @@ public class TransactionActivity extends Activity {
         timeButton.setOnClickListener(timeOnClickListener);
         LinearLayout timeView = UIBuilder.createViewWithLabel(this, "Time", timeButton);
         layout.addView(UIBuilder.createHorizontalView(this, dateView, timeView));
-        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, "OK", okOnClickListener), UIBuilder.createButton(this, "Cancel", cancelOnClickListener)));
+        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, Constants.BUTTON_OK, okOnClickListener), UIBuilder.createButton(this, Constants.BUTTON_CANCEL, cancelOnClickListener)));
 
         setContentView(layout);
     }
@@ -139,6 +141,9 @@ public class TransactionActivity extends Activity {
     protected void onResume() {
         refreshCategoryList();
         accountId = this.getIntent().getIntExtra("accountId", -1);
+        int categoryId = this.getIntent().getIntExtra("categoryId", -1);
+        if(categoryId > 0)
+            categorySpinner.setSelection(categoryId-1);
         transaction = (Transaction) this.getIntent().getSerializableExtra("transaction");
         if(transaction != null){
             amountEditBox.setText(Double.toString(Math.abs(transaction.getAmount())));
@@ -153,7 +158,7 @@ public class TransactionActivity extends Activity {
     
     private void refreshCategoryList(){
         categoryItems.clear();       
-        categoryItems.addAll(Category.list());
+        categoryItems.addAll(Cache.getCategories());
         categoryAdapter.notifyDataSetChanged();
     }
     

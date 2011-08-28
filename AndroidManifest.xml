@@ -17,6 +17,7 @@
         <activity android:name="TransferActivity" android:label="Transfer money"/>
         <activity android:name="GroupActivity" android:label="Edit group"/>
         <activity android:name="TransactionsActivity" android:label="Transactions"/>
+        <activity android:name="SummaryActivity" android:label="Account summary"/>
         <activity android:name="TransactionActivity" android:label="Edit transaction"/>
     </application>
 </manifest> 

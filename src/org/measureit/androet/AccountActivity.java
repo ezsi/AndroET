@@ -17,6 +17,7 @@ import org.measureit.androet.util.Cache;
 import org.measureit.androet.ui.UIBuilder;
 import org.measureit.androet.db.UpdateBuilder;
 import org.measureit.androet.db.WhereBuilder;
+import org.measureit.androet.util.Constants;
 
 /**
  *
@@ -39,7 +40,7 @@ public class AccountActivity extends Activity {
             double budget = Helper.parseDouble(budgetEditBox.getText().toString(), 0);
             String currencyCode = ((Currency)currencySpinner.getSelectedItem()).getCurrencyCode();
             if(account == null)
-                Account.create(accountName, initialBalance, budget, currencyCode, false);
+                Account.insert(accountName, initialBalance, budget, currencyCode, false);
             else  // edit => update
                 UpdateBuilder.table(Account.TABLE_NAME).column(Account.COL_NAME, accountName)
                     .column(Account.COL_INITIAL_BALANCE, initialBalance).column(Account.COL_CURRENCY, currencyCode)
@@ -76,7 +77,7 @@ public class AccountActivity extends Activity {
         currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         currencySpinner.setAdapter(currencyAdapter);
         layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Currency", currencySpinner) );
-        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, "OK", okOnClickListener), UIBuilder.createButton(this, "Cancel", cancelOnClickListener)));
+        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, Constants.BUTTON_OK, okOnClickListener), UIBuilder.createButton(this, Constants.BUTTON_CANCEL, cancelOnClickListener)));
 
         setContentView(layout);
     }

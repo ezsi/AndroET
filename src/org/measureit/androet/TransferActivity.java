@@ -24,6 +24,8 @@ import org.measureit.androet.db.Category;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.util.Helper;
 import org.measureit.androet.ui.UIBuilder;
+import org.measureit.androet.util.Cache;
+import org.measureit.androet.util.Constants;
 
 /**
  *
@@ -46,10 +48,10 @@ public class TransferActivity extends Activity {
                 return;
             final int timeInSec = Helper.calendarToSeconds(calendar);
             double amount = Helper.parseDouble(amountEditBox.getText().toString(), 0);
-            Category outTransactionCategory = Category.getByName("Transfer(Outward)");
-            Category inTransactionCategory = Category.getByName("Transfer(Inward)");
-            Transaction.create(account.getId(), outTransactionCategory.getId(), - 1 * amount, descriptionEditBox.getText().toString(), timeInSec);
-            Transaction.create(selectedAccount.getId(), inTransactionCategory.getId(), amount, descriptionEditBox.getText().toString(), timeInSec);
+            Category outTransactionCategory = Cache.getCategoryByName("Transfer(Outward)");
+            Category inTransactionCategory = Cache.getCategoryByName("Transfer(Inward)");
+            Transaction.insert(account.getId(), outTransactionCategory.getId(), - 1 * amount, descriptionEditBox.getText().toString(), timeInSec);
+            Transaction.insert(selectedAccount.getId(), inTransactionCategory.getId(), amount, descriptionEditBox.getText().toString(), timeInSec);
             TransferActivity.this.finish();
         }
     };
@@ -126,7 +128,7 @@ public class TransferActivity extends Activity {
         timeButton.setOnClickListener(timeOnClickListener);
         LinearLayout timeView = UIBuilder.createViewWithLabel(this, "Time", timeButton);
         layout.addView( UIBuilder.createHorizontalView(this, dateView, timeView));
-        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, "OK", okOnClickListener), UIBuilder.createButton(this, "Cancel", cancelOnClickListener)));
+        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, Constants.BUTTON_OK, okOnClickListener), UIBuilder.createButton(this, Constants.BUTTON_CANCEL, cancelOnClickListener)));
 
         setContentView(layout);
     }

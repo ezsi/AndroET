@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -32,6 +31,7 @@ import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 
 // TODO: add currency conversion
+// TODO: add PIN protection
 
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();
@@ -63,7 +63,7 @@ public class AccountsActivity extends Activity{
         listView.setOnItemClickListener(new OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ActivitySwitch.to(AccountsActivity.this, TransactionsActivity.class).add("account", listItems.get(position)).execute();
+                ActivitySwitch.to(AccountsActivity.this, SummaryActivity.class).add("account", listItems.get(position)).execute();
             }
         });
         setContentView(listView);
@@ -74,13 +74,7 @@ public class AccountsActivity extends Activity{
     public static Context getAppContext(){
         return context;
     }
-    
-//    private void switchToActivity(Context context, Class clazz, Account account){
-//        Intent activity = new Intent(context, clazz);
-//        activity.putExtra("account", account);
-//        AccountsActivity.this.startActivity(activity);
-//    }
-    
+        
     @Override
     protected void onResume() {
         refreshAccountList();
@@ -118,7 +112,9 @@ public class AccountsActivity extends Activity{
         selectedAccount = (Account) listView.getItemAtPosition(listItemIndex);
         
         final String itemTitle = item.toString();
-        if(Constants.ACCOUNT_CREATE_GROUP.equals(itemTitle))
+        if(Constants.TRANSACTION_ADD.equals(itemTitle))
+            ActivitySwitch.to(this, TransactionActivity.class).add("accountId", selectedAccount.getId()).execute();
+        else if(Constants.ACCOUNT_CREATE_GROUP.equals(itemTitle))
             ActivitySwitch.to(AccountsActivity.this, GroupActivity.class).execute();
         else if(Constants.ACCOUNT_CREATE.equals(itemTitle))
             ActivitySwitch.to(AccountsActivity.this, AccountActivity.class).execute();
@@ -138,6 +134,7 @@ public class AccountsActivity extends Activity{
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        menu.add(Constants.TRANSACTION_ADD);
         menu.add(Constants.ACCOUNT_CREATE);
         menu.add(Constants.ACCOUNT_CREATE_GROUP);
         menu.add(Constants.ACCOUNT_EDIT);        
@@ -156,9 +153,9 @@ public class AccountsActivity extends Activity{
         }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            final TableRow.LayoutParams cellLp = new TableRow.LayoutParams(
+            final TableRow.LayoutParams cellParams = new TableRow.LayoutParams(
                     ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT, 1.0f);
-            cellLp.setMargins(2, 2, 2, 2);
+            cellParams.setMargins(2, 2, 2, 2);
             
             final TableLayout.LayoutParams rowParams = new TableLayout
                     .LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.FILL_PARENT);
@@ -166,13 +163,15 @@ public class AccountsActivity extends Activity{
             
             Account account = items.get(position);
             TableLayout tableLayout = new TableLayout(AccountsActivity.this);
-            int textColor = account.isGroup() ? Color.rgb(50, 220, 220) : Color.BLACK;            
+            final int textColor = account.isGroup() ? Constants.HIGHLIGHT_COLOR : Constants.HEADER_TEXT_COLOR;            
             TableRow row1 = new TableRow(AccountsActivity.this);
             row1.setLayoutParams(rowParams);
-            row1.addView(TextViewBuilder.text(AccountsActivity.this, account.getName()).size(Constants.HEADER_TEXT_SIZE).color(Color.DKGRAY).color(textColor).build());
+            row1.addView(TextViewBuilder.text(AccountsActivity.this, account.getName())
+                    .size(Constants.HEADER_TEXT_SIZE).color(textColor).build());
             TextView amountTextView = TextViewBuilder.text(AccountsActivity.this, account.getCurrency().getSymbol()
-                    +" "+account.getBalance()).size(Constants.TEXT_SIZE+2).color(Color.DKGRAY).gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).color(textColor).build();
-            amountTextView.setLayoutParams(cellLp);
+                    +" "+account.getBalance()).size(Constants.TEXT_SIZE+2)
+                    .gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).color(textColor).build();
+            amountTextView.setLayoutParams(cellParams);
             row1.addView(amountTextView);
 
             TableRow row2 = new TableRow(AccountsActivity.this);
@@ -180,16 +179,16 @@ public class AccountsActivity extends Activity{
             double expense = Transaction.sum(account, Calendar.getInstance().get(Calendar.MONTH)+1);
             StringBuilder expenseSb = new StringBuilder();
             if(expense < 0)
-                expenseSb.append("Expense: ").append(Double.toString(Math.abs(expense)));
+                expenseSb.append(Constants.ACCOUNT_EXPENSE).append(Double.toString(Math.abs(expense)));
             else if (expense > 0)
-                expenseSb.append("Income: ").append(Double.toString(Math.abs(expense)));
+                expenseSb.append(Constants.ACCOUNT_INCOME).append(Double.toString(Math.abs(expense)));
             
-            int expenseColor = Color.LTGRAY;
+            int expenseColor = Constants.TEXT_COLOR;
             if(expense < 0 && account.getBudget() > 0){
                 double availableBudget = account.getBudget()+expense;
                 expenseSb.append(" / ").append(Double.toString(availableBudget));
                 if(availableBudget < 0)
-                    expenseColor = Color.RED;
+                    expenseColor = Constants.WARNING_COLOR;
             }
             row2.addView(TextViewBuilder.text(AccountsActivity.this, expenseSb.toString()).color(expenseColor).build());
             

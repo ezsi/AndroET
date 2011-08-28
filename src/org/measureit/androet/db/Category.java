@@ -48,7 +48,7 @@ public class Category implements Serializable{
         return expense;
     }
     
-    public static void create(SQLiteDatabase db, String categoryName, boolean expense) {
+    public static void insert(SQLiteDatabase db, String categoryName, boolean expense) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(COL_NAME, categoryName);
         initialValues.put(COL_EXPENSE, expense);
@@ -64,15 +64,7 @@ public class Category implements Serializable{
         return categories;
     }
     
-    //TODO: may improve this later
-    public static Category getByName(String categoryName){
-        List<Category> categories = list();
-        for(Category category : categories)
-            if(category.getName().equals(categoryName))
-                return category;
-        return null;
-    }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

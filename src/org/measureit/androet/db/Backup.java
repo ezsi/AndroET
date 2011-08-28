@@ -60,7 +60,7 @@ public class Backup {
         List<Account> accounts = Account.list(db);
         Map<Integer, Integer> accountIdMap = new HashMap<Integer, Integer>();
         for(Account account : accounts){
-            Account.create(account);
+            Account.insert(account);
             int accountId = DatabaseHelper.getInstance().getLastInsertRowId();
             accountIdMap.put(account.getId(), accountId);
             if(account.isGroup()) // group doesn't have real transactions
@@ -68,16 +68,17 @@ public class Backup {
             List<Transaction> transactions = Transaction.list(account, db);
             for(Transaction transaction : transactions){
                 transaction.setAccountId(accountId); // needed for proper auto id handling
-                Transaction.create(transaction);
+                Transaction.insert(transaction);
             }
         }
         for(Account account : accounts){
             List<Account> groupAccounts = Account.list(account.getId(), db);
             int accountId = accountIdMap.get(account.getId());
             for(Account groupAccount : groupAccounts){
-                Account.addGroup(accountId, accountIdMap.get(groupAccount.getId()));
+                Account.insertGroup(accountId, accountIdMap.get(groupAccount.getId()));
             }
         }
+        db.close();
     }
     
 }

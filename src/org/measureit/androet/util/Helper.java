@@ -20,11 +20,15 @@ public class Helper {
         return (int)(calendar.getTimeInMillis()/1000);
     }
 
-    public static void resetDate(Calendar calendar){
+    /**
+     * Resets the date, hour, minute, second values in a calendar object.
+     */
+    public static Calendar resetDate(Calendar calendar){
         calendar.set(Calendar.DATE, 0);
         calendar.set(Calendar.HOUR, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
+        return calendar;
     }
-    
+
 }

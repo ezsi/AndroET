@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -15,7 +14,9 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TableLayout;
@@ -24,12 +25,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import org.measureit.androet.db.Account;
-import org.measureit.androet.db.Category;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
-
-//TODO: add category grouping
 
 /**
  *
@@ -41,6 +39,7 @@ public class TransactionsActivity extends Activity {
     private ListView listView;
     private ArrayAdapter listAdapter;
     private Account account;
+    private Transaction transaction;
     private Transaction selectedTransaction;
     private DialogInterface.OnClickListener confirmDialogClickListener = new DialogInterface.OnClickListener() {
         @Override
@@ -62,21 +61,31 @@ public class TransactionsActivity extends Activity {
         registerForContextMenu(listView);
         setContentView(listView);
         listAdapter =  new TransactionAdapter(this,android.R.layout.simple_list_item_1 , listItems);
+        listView.setOnItemClickListener(new OnItemClickListener() {
+
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ActivitySwitch.to(TransactionsActivity.this, TransactionActivity.class)
+                    .add("accountId", account.getId())
+                    .add("transaction", listItems.get(position))
+                    .execute();
+            }
+        });
         listView.setAdapter(listAdapter);
     }
     
     @Override
     protected void onResume() {
         account = (Account) this.getIntent().getSerializableExtra("account");
+        transaction = (Transaction) this.getIntent().getSerializableExtra("transaction");
+        setTitle(account.getName() + " Transactions");
         refreshTransactionList();
         super.onResume();
     }
     
     private void refreshTransactionList(){
         listItems.clear();       
-        listItems.addAll(Transaction.list(account));
-        if(listItems.isEmpty())
-            listItems.add(new Transaction(0, account.getId(), new Category(-1, "Tap me long!", true), 0, "Tap me long!", Calendar.getInstance()));
+        final int categoryId = transaction.getCategory() == null ? -1 : transaction.getCategory().getId();
+        listItems.addAll(Transaction.list(account, transaction.getYear(), transaction.getMonth(), categoryId));
         listAdapter.notifyDataSetChanged();
     }
     
@@ -89,33 +98,23 @@ public class TransactionsActivity extends Activity {
         final String itemTitle = item.toString();
         if(Constants.TRANSACTION_DELETE.equals(itemTitle)){
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Are you sure you want to delete this transaction?").setPositiveButton("Yes", confirmDialogClickListener)
+            builder.setMessage("Are you sure you want to delete this transaction?")
+                .setPositiveButton("Yes", confirmDialogClickListener)
                 .setNegativeButton("No", confirmDialogClickListener).show();
-            
-        }else if(Constants.TRANSACTION_EDIT.equals(itemTitle)){
-            ActivitySwitch.to(this, TransactionActivity.class)
-                    .add("accountId", account.getId())
-                    .add("transaction", selectedTransaction)
-                    .execute();
         }else if(Constants.TRANSACTION_ADD.equals(itemTitle)){
-            ActivitySwitch.to(this, TransactionActivity.class)
-                    .add("accountId", account.getId())
-                    .execute();
+            ActivitySwitch activitySwitch = ActivitySwitch.to(this, TransactionActivity.class).add("accountId", account.getId());
+            if(selectedTransaction.getCategory() != null) // it's a real category and not a group
+                activitySwitch = activitySwitch.add("categoryId", selectedTransaction.getCategory().getId());
+            activitySwitch.execute();
         }
         return super.onContextItemSelected(item);
     }
 
-    private void showTransactionActivity(){
-        Intent activity = new Intent(TransactionsActivity.this, TransactionActivity.class);
-        activity.putExtra("accountId", account.getId());
-        TransactionsActivity.this.startActivity(activity);
-    }
     
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         if(!account.isGroup())
             menu.add(Constants.TRANSACTION_ADD);
-        menu.add(Constants.TRANSACTION_EDIT);
         menu.add(Constants.TRANSACTION_DELETE);
         super.onCreateContextMenu(menu, v, menuInfo);
     }
@@ -144,19 +143,26 @@ public class TransactionsActivity extends Activity {
             TableRow row1 = new TableRow(TransactionsActivity.this);
             row1.setLayoutParams(rowParams);
             String dateText = DateFormat.format("MMM", tr.getDate()).toString(); // DateFormat.getDateFormat(TransactionsActivity.this).format(tr.getDate().getTime());
-            row1.addView(TextViewBuilder.text(TransactionsActivity.this, dateText).gravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL).size(Constants.TEXT_SIZE).build());  
-            row1.addView(TextViewBuilder.text(TransactionsActivity.this, "  "+tr.getCategory().getName()).gravity(Gravity.BOTTOM).size(Constants.HEADER_TEXT_SIZE).color(Color.DKGRAY).build());
+            row1.addView(TextViewBuilder.text(TransactionsActivity.this, dateText)
+                    .gravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL)
+                    .size(Constants.TEXT_SIZE).color(Constants.TEXT_COLOR).build());  
+            row1.addView(TextViewBuilder.text(TransactionsActivity.this, "  "+tr.getCategory().getName())
+                    .gravity(Gravity.BOTTOM).size(Constants.HEADER_TEXT_SIZE)
+                    .color(Constants.HEADER_TEXT_COLOR).build());
             
             TextView amountTextView = TextViewBuilder.text(TransactionsActivity.this, account.getCurrency().getSymbol()
-                    +" "+tr.getAmount()).size(Constants.TEXT_SIZE+2).color(Color.DKGRAY).gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).build();
+                    +" "+tr.getAmount()).size(Constants.TEXT_SIZE+2)
+                    .color(Constants.HEADER_TEXT_COLOR).gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).build();
             amountTextView.setLayoutParams(cellLp);
             row1.addView(amountTextView);
              
             TableRow row2 = new TableRow(TransactionsActivity.this);
             row2.setLayoutParams(rowParams);
-            row2.addView(TextViewBuilder.text(TransactionsActivity.this, tr.getDate().get(Calendar.DATE)+".").gravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL).size(Constants.TEXT_SIZE).build());
-            row2.addView(TextViewBuilder.text(TransactionsActivity.this, "   "+tr.getDescription()).size(Constants.TEXT_SIZE).color(Color.LTGRAY).build());
-            row2.addView(TextViewBuilder.text(TransactionsActivity.this, "").build());
+            row2.addView(TextViewBuilder.text(TransactionsActivity.this, tr.getDate().get(Calendar.DATE)+".")
+                    .gravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL)
+                    .size(Constants.TEXT_SIZE).color(Constants.TEXT_COLOR).build());
+            row2.addView(TextViewBuilder.text(TransactionsActivity.this, "   "+tr.getDescription())
+                    .size(Constants.TEXT_SIZE).color(Constants.TEXT_COLOR).build());
             
             tableLayout.addView(row1);
             tableLayout.addView(row2);

@@ -21,6 +21,7 @@ import org.measureit.androet.util.Cache;
 import org.measureit.androet.ui.UIBuilder;
 import org.measureit.androet.db.UpdateBuilder;
 import org.measureit.androet.db.WhereBuilder;
+import org.measureit.androet.util.Constants;
 import org.measureit.androet.util.Helper;
 
 /**
@@ -39,27 +40,25 @@ public class GroupActivity extends Activity {
     private ArrayAdapter accountListAdapter;
     private OnClickListener okOnClickListener = new OnClickListener() {
         public void onClick(View arg0) {
-            
-            //String accountName = (accountNameEditBox.getText() == null) ? "Untitled" : accountNameEditBox.getText().toString();
             String accountName = accountNameEditBox.getText().toString();
             if(accountName.isEmpty())
                 accountName = "Untitled";
             String currencyCode = ((Currency)currencySpinner.getSelectedItem()).getCurrencyCode();
             double budget = Helper.parseDouble(budgetEditBox.getText().toString(), 0);
             if(account == null)
-                Account.create(accountName, 0, budget, currencyCode, true);
+                Account.insert(accountName, 0, budget, currencyCode, true);
             else{
                 UpdateBuilder.table(Account.TABLE_NAME).column(Account.COL_NAME, accountName)
                         .column(Account.COL_CURRENCY, currencyCode).column(Account.COL_BUDGET, budget)
                     .where(WhereBuilder.get().where(Account.COL_ID).build(), Integer.toString(account.getId()))
                     .update();
-                Account.clearGroup(account); // no complicated update logic just: drop + add again
+                Account.deleteGroup(account); // no complicated update logic just: drop + add again
             }
             final int groupId = (account == null) ? DatabaseHelper.getInstance().getLastInsertRowId() : account.getId();
             SparseBooleanArray checkedItems = accountListView.getCheckedItemPositions();    
             for(int i=0, n = accountListView.getCount(); i<n; i++)
                 if(checkedItems.get(i))
-                    Account.addGroup(groupId, accountListItems.get(i).getId());
+                    Account.insertGroup(groupId, accountListItems.get(i).getId());
             GroupActivity.this.finish();
         }
     };
@@ -95,7 +94,7 @@ public class GroupActivity extends Activity {
         accountListView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT, 1f));
         layout.addView(accountListView);
         
-        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, "OK", okOnClickListener), UIBuilder.createButton(this, "Cancel", cancelOnClickListener)));
+        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, Constants.BUTTON_OK, okOnClickListener), UIBuilder.createButton(this, Constants.BUTTON_CANCEL, cancelOnClickListener)));
         setContentView(layout);
     }
     

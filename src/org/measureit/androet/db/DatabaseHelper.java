@@ -13,7 +13,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper instance;
     private static final String DATABASE_NAME = "androet";
-    public static final int DATABASE_VERSION = 28;
+    public static final int DATABASE_VERSION = 32; 
     
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -26,42 +26,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
     
     @Override
-    public void onCreate(SQLiteDatabase db) {
+    public void onCreate(SQLiteDatabase db) { 
         db.execSQL(Category.TABLE_CREATE);
         db.execSQL(Account.TABLE_CREATE);        
         db.execSQL(Account.MAP_TABLE_CREATE);        
         db.execSQL(Transaction.TABLE_CREATE);
+        db.execSQL(Transaction.VIEW_CREATE);
         
-        Category.create(db, "Accommodation", true);
-        Category.create(db, "Automobile", true);
-        Category.create(db, "Child Support", false);
-        Category.create(db, "Credit Card", true);
-        Category.create(db, "Donation", true);
-        Category.create(db, "Entertainment", true);
-        Category.create(db, "Food", true);
-        Category.create(db, "Gifts - Given", true);
-        Category.create(db, "Gifts - Received", false);
-        Category.create(db, "Groceries", true);
-        Category.create(db, "Household", true);
-        Category.create(db, "Income", false);
-        Category.create(db, "Insurance", true);
-        Category.create(db, "Investment", false);
-        Category.create(db, "Interest", false);
-        Category.create(db, "Medicare", true);
-        Category.create(db, "Personal Care", true);
-        Category.create(db, "Pets", true);
-        Category.create(db, "Salary", false);
-        Category.create(db, "Self Improvement", true);
-        Category.create(db, "Shopping", true);
-        Category.create(db, "Sport & Recreation", true);
-        Category.create(db, "Tax", true);
-        Category.create(db, "Transfer(Outward)", true);
-        Category.create(db, "Transfer(Inward)", false);
-        Category.create(db, "Transportation", true);
-        Category.create(db, "Utilities", true);
-        Category.create(db, "Vacation", true);
-        Category.create(db, "Other expense", true);
-        Category.create(db, "Other income", false);
+        Category.insert(db, "Accommodation", true);
+        Category.insert(db, "Automobile", true);
+        Category.insert(db, "Child Support", false);
+        Category.insert(db, "Credit Card", true);
+        Category.insert(db, "Donation", true);
+        Category.insert(db, "Entertainment", true);
+        Category.insert(db, "Food", true);
+        Category.insert(db, "Gifts - Given", true);
+        Category.insert(db, "Gifts - Received", false);
+        Category.insert(db, "Groceries", true);
+        Category.insert(db, "Household", true);
+        Category.insert(db, "Income", false);
+        Category.insert(db, "Insurance", true);
+        Category.insert(db, "Investment", false);
+        Category.insert(db, "Interest", false);
+        Category.insert(db, "Medicare", true);
+        Category.insert(db, "Personal Care", true);
+        Category.insert(db, "Pets", true);
+        Category.insert(db, "Salary", false);
+        Category.insert(db, "Self Improvement", true);
+        Category.insert(db, "Shopping", true);
+        Category.insert(db, "Sport & Recreation", true);
+        Category.insert(db, "Tax", true);
+        Category.insert(db, "Transfer(Outward)", true);
+        Category.insert(db, "Transfer(Inward)", false);
+        Category.insert(db, "Transportation", true);
+        Category.insert(db, "Utilities", true);
+        Category.insert(db, "Vacation", true);
+        Category.insert(db, "Other expense", true);
+        Category.insert(db, "Other income", false);
         
     }
 
@@ -83,6 +84,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Account.MAP_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Account.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Transaction.TABLE_NAME);
+        db.execSQL("DROP VIEW IF EXISTS " + Transaction.VIEW_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Category.TABLE_NAME);
     }
     
