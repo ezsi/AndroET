@@ -167,9 +167,15 @@ public class Transaction implements Serializable{
                 "SELECT SUM(t." + COL_AMOUNT + ") FROM " + VIEW_NAME + " AS t," + Account.MAP_TABLE_NAME
                 + " AS a WHERE t." + COL_ACCOUNT_ID + " = a." + Account.COL_MAP_ACCOUNT_ID 
                 + " AND a." + Account.COL_MAP_GROUP_ID + " = " + account.getId() 
+                +" AND " + COL_AMOUNT + " < 0 " 
+                +" AND " + COL_CATEGORY_ID + " <> 24" /** OUT TRANSACTION is not expense **/
                 + " AND t." + VIEW_COL_MONTH + " = " + month, null)
             : DatabaseHelper.getInstance().getWritableDatabase().rawQuery(
-                "SELECT SUM("+COL_AMOUNT+") FROM "+VIEW_NAME+" WHERE "+COL_ACCOUNT_ID+"="+account.getId() + " AND " + VIEW_COL_MONTH + " = " + month, null);
+                "SELECT SUM("+COL_AMOUNT+") FROM "+VIEW_NAME
+                +" WHERE "+COL_ACCOUNT_ID+"="+account.getId() 
+                +" AND " + COL_AMOUNT + " < 0 " 
+                +" AND " + COL_CATEGORY_ID + " <> 24" /** OUT TRANSACTION is not expense **/
+                +" AND " + VIEW_COL_MONTH + " = " + month, null);
         
         if(cursor.moveToFirst()) 
             return cursor.getDouble(0);
