@@ -44,7 +44,7 @@ public class GroupActivity extends Activity {
             if(accountName.isEmpty())
                 accountName = "Untitled";
             String currencyCode = ((Currency)currencySpinner.getSelectedItem()).getCurrencyCode();
-            double budget = Helper.parseDouble(budgetEditBox.getText().toString(), 0);
+            double budget = Helper.parseDouble(budgetEditBox.getText().toString(), 0D);
             if(account == null)
                 Account.insert(accountName, 0, budget, currencyCode, true);
             else{

@@ -19,6 +19,7 @@ public interface Constants {
     static final String ACCOUNT_SETTINGS = "Settings";
     static final String ACCOUNT_SAVE_DB = "Save Database";
     static final String ACCOUNT_LOAD_DB = "Load Database";
+    static final String ACCOUNT_REFRESH_CURRENCY_RATES = "Refresh rates";
     static final String TRANSACTION_ADD = "Add transaction";
     static final String TRANSACTION_DELETE = "Delete transaction";
     static final String BUTTON_OK = "OK";

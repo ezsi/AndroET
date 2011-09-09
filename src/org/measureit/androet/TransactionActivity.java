@@ -50,11 +50,11 @@ public class TransactionActivity extends Activity {
             final int timeInSec = Helper.calendarToSeconds(calendar);
             int sign = selectedCategory.isExpense() ? -1 : 1;
             if(transaction == null)
-                Transaction.insert(accountId, selectedCategory.getId(), sign * Helper.parseDouble(amountEditBox.getText().toString(), 0), descriptionEditBox.getText().toString(), timeInSec);
+                Transaction.insert(accountId, selectedCategory.getId(), sign * Helper.parseDouble(amountEditBox.getText().toString(), 0D), descriptionEditBox.getText().toString(), timeInSec);
             else
                 UpdateBuilder.table(Transaction.TABLE_NAME)
                     .column(Transaction.COL_CATEGORY_ID, selectedCategory.getId())
-                    .column(Transaction.COL_AMOUNT, sign * Helper.parseDouble(amountEditBox.getText().toString(), 0))
+                    .column(Transaction.COL_AMOUNT, sign * Helper.parseDouble(amountEditBox.getText().toString(), 0D))
                     .column(Transaction.COL_DESCRIPTION, descriptionEditBox.getText().toString())
                     .column(Transaction.COL_DATE, timeInSec)
                     .where(WhereBuilder.get().where(Transaction.COL_ID).build(), Integer.toString(transaction.getId()))

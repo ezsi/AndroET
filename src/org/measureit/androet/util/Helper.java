@@ -8,7 +8,7 @@ import java.util.Calendar;
  */
 public class Helper {
     
-    public static double parseDouble(String value, double defaultValue){
+    public static Double parseDouble(String value, Double defaultValue){
         try{
             return Double.parseDouble(value);
         }catch (NumberFormatException handled) {

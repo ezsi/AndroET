@@ -13,7 +13,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper instance;
     private static final String DATABASE_NAME = "androet";
-    public static final int DATABASE_VERSION = 32; 
+    public static final int DATABASE_VERSION = 33; 
     
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,6 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(Account.MAP_TABLE_CREATE);        
         db.execSQL(Transaction.TABLE_CREATE);
         db.execSQL(Transaction.VIEW_CREATE);
+        db.execSQL(CurrencyRate.TABLE_CREATE);
         
         Category.insert(db, "Accommodation", true);
         Category.insert(db, "Automobile", true);
@@ -86,6 +87,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Transaction.TABLE_NAME);
         db.execSQL("DROP VIEW IF EXISTS " + Transaction.VIEW_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Category.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CurrencyRate.TABLE_NAME);
     }
     
     public int getLastInsertRowId(){

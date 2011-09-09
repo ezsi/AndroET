@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import org.measureit.androet.db.Account;
 import org.measureit.androet.db.Backup;
+import org.measureit.androet.db.CurrencyRate;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
@@ -97,6 +98,9 @@ public class AccountsActivity extends Activity{
             Backup.save();
         else if(Constants.ACCOUNT_LOAD_DB.equals(itemTitle))
             Backup.load();
+        else if(Constants.ACCOUNT_REFRESH_CURRENCY_RATES.equals(itemTitle))
+            CurrencyRate.download();
+        
         return super.onOptionsItemSelected(item);
     }
     
@@ -104,6 +108,7 @@ public class AccountsActivity extends Activity{
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(Constants.ACCOUNT_SAVE_DB);
         menu.add(Constants.ACCOUNT_LOAD_DB);
+        menu.add(Constants.ACCOUNT_REFRESH_CURRENCY_RATES);
         return super.onCreateOptionsMenu(menu);
     }
 

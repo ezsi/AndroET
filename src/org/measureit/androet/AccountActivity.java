@@ -36,8 +36,8 @@ public class AccountActivity extends Activity {
             String accountName = accountNameEditBox.getText().toString();
             if(accountName.isEmpty())
                 accountName = "Untitled";
-            double initialBalance = Helper.parseDouble(initialBalanceEditBox.getText().toString(), 0);
-            double budget = Helper.parseDouble(budgetEditBox.getText().toString(), 0);
+            double initialBalance = Helper.parseDouble(initialBalanceEditBox.getText().toString(), 0D);
+            double budget = Helper.parseDouble(budgetEditBox.getText().toString(), 0D);
             String currencyCode = ((Currency)currencySpinner.getSelectedItem()).getCurrencyCode();
             if(account == null)
                 Account.insert(accountName, initialBalance, budget, currencyCode, false);

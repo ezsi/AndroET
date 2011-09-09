@@ -47,7 +47,7 @@ public class TransferActivity extends Activity {
             if(selectedAccount == null) // the list was empty
                 return;
             final int timeInSec = Helper.calendarToSeconds(calendar);
-            double amount = Helper.parseDouble(amountEditBox.getText().toString(), 0);
+            double amount = Helper.parseDouble(amountEditBox.getText().toString(), 0D);
             Category outTransactionCategory = Cache.getCategoryByName("Transfer(Outward)");
             Category inTransactionCategory = Cache.getCategoryByName("Transfer(Inward)");
             Transaction.insert(account.getId(), outTransactionCategory.getId(), - 1 * amount, descriptionEditBox.getText().toString(), timeInSec);
