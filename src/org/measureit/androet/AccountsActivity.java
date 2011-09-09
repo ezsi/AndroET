@@ -32,6 +32,7 @@ import org.measureit.androet.ui.TextViewBuilder;
 
 // TODO: add currency conversion
 // TODO: add PIN protection
+// TODO: fix expense calculation
 
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();

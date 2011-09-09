@@ -29,6 +29,8 @@ import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Constants;
 import org.measureit.androet.util.Helper;
 
+//TODO: replace context menu with gesture
+
 /**
  *
  * @author ezsi

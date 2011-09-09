@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.widget.ListView;
 
+//TODO: add PIN settings    
 /**
  * 
  * @author ezsi

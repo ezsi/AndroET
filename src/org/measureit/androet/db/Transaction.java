@@ -180,7 +180,7 @@ public class Transaction implements Serializable{
         List<Transaction> transactions = new ArrayList<Transaction>();
         SQLiteDatabase db = DatabaseHelper.getInstance().getWritableDatabase();
         String commonSuffix = " GROUP BY t." + VIEW_COL_YEAR + ", t." + VIEW_COL_MONTH + ", t." + COL_CATEGORY_ID
-                + " ORDER by t." + VIEW_COL_YEAR + ", t." + VIEW_COL_MONTH + ", t." + COL_CATEGORY_ID;
+                + " ORDER by t." + VIEW_COL_YEAR + " DESC , t." + VIEW_COL_MONTH + " DESC, t." + COL_CATEGORY_ID;
         Cursor cursor = db.rawQuery((account.isGroup()) ?
             "SELECT t." + COL_CATEGORY_ID + ", sum(t." + COL_AMOUNT + "), t." + VIEW_COL_YEAR + ", t." + VIEW_COL_MONTH
                 + " FROM "+ VIEW_NAME + " AS t," + Account.MAP_TABLE_NAME + " AS a"
