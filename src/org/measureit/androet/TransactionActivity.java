@@ -151,7 +151,9 @@ public class TransactionActivity extends Activity {
             calendar = transaction.getDate();
             updateDateTime();
             categorySpinner.setSelection(categoryItems.indexOf(transaction.getCategory()));
-        }
+            setTitle("Edit transaction");
+        }else
+            setTitle("New transaction");
         
         super.onResume();
     }

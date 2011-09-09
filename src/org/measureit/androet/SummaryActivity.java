@@ -5,10 +5,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,8 +30,6 @@ import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Constants;
 import org.measureit.androet.util.Helper;
-
-//TODO: replace context menu with gesture
 
 /**
  *
@@ -60,29 +60,21 @@ public class SummaryActivity extends Activity {
                         .execute();
             }
         });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Transaction selectedTransaction = listItems.get(position);
+                ActivitySwitch activitySwitch = ActivitySwitch.to(SummaryActivity.this, TransactionActivity.class)
+                        .add("accountId", account.getId());
+                if(selectedTransaction.getCategory() != null) // it's a real category and not a group
+                    activitySwitch = activitySwitch.add("categoryId", selectedTransaction.getCategory().getId());
+                activitySwitch.execute();
+                return true;
+            }
+        });
         listView.setAdapter(listAdapter);
     }
     
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        int listItemIndex = (int) ((AdapterContextMenuInfo)item.getMenuInfo()).id;
-        Transaction selectedTransaction = (Transaction) listView.getItemAtPosition(listItemIndex);
-        
-        final String itemTitle = item.toString();
-        if(Constants.TRANSACTION_ADD.equals(itemTitle)){
-            ActivitySwitch activitySwitch = ActivitySwitch.to(this, TransactionActivity.class).add("accountId", account.getId());
-            if(selectedTransaction.getCategory() != null) // it's a real category and not a group
-                activitySwitch = activitySwitch.add("categoryId", selectedTransaction.getCategory().getId());
-            activitySwitch.execute();
-        }
-        return super.onContextItemSelected(item);
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        menu.add(Constants.TRANSACTION_ADD);
-        super.onCreateContextMenu(menu, v, menuInfo);
-    }
     
     @Override
     protected void onResume() {
