@@ -64,10 +64,13 @@ public class SummaryActivity extends Activity {
 
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Transaction selectedTransaction = listItems.get(position);
+                Log.e(Constants.LOG_NAME, selectedTransaction.toString());
                 ActivitySwitch activitySwitch = ActivitySwitch.to(SummaryActivity.this, TransactionActivity.class)
                         .add("accountId", account.getId());
-                if(selectedTransaction.getCategory() != null) // it's a real category and not a group
+                if(selectedTransaction.getCategory() != null){ // it's a real category and not a group
+                    Log.e(Constants.LOG_NAME, "Cat id: "+selectedTransaction.getCategory().getId());
                     activitySwitch = activitySwitch.add("categoryId", selectedTransaction.getCategory().getId());
+                }
                 activitySwitch.execute();
                 return true;
             }

@@ -16,6 +16,8 @@ import org.measureit.androet.db.Category;
 public class Cache {
     private static final HashMap<Integer, Category> CATEGORY_CACHE = new HashMap<Integer, Category>();
     
+    private static final List<Category> CATEGORY_LIST = new ArrayList<Category>();
+    
     private static final Map<String, Currency> CURRENCY_CACHE = new HashMap<String, Currency>();
     
     private static final Comparator<Currency> CURRENCY_COMPARATOR = new Comparator<Currency>(){
@@ -48,9 +50,9 @@ public class Cache {
     "XAG", "KHR", "XAF", "GYD", "AFN", "SOS", "TOP", "AOA", "KPW" };
     
     public static List<Category> getCategories(){
-        if(CATEGORY_CACHE.isEmpty())
+        if(CATEGORY_LIST.isEmpty())
             reloadCategoryCache();
-        return new ArrayList<Category>(CATEGORY_CACHE.values());
+        return CATEGORY_LIST;
     }
     
     public static Category getCategory(int id){
@@ -68,8 +70,9 @@ public class Cache {
     }
     
     private static void reloadCategoryCache(){
-        List<Category> categories = Category.list();
-        for(Category category : categories)
+        CATEGORY_LIST.clear();
+        CATEGORY_LIST.addAll(Category.list());
+        for(Category category : CATEGORY_LIST)
             CATEGORY_CACHE.put(category.getId(), category);
     }
     

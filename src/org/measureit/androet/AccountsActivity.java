@@ -31,6 +31,7 @@ import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 
 // TODO: add currency conversion
+//http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s=EURHUF=X%20EURUSD=X
 // TODO: add PIN protection
 
 public class AccountsActivity extends Activity{

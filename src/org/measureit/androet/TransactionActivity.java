@@ -7,6 +7,7 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
@@ -144,6 +145,7 @@ public class TransactionActivity extends Activity {
         int categoryId = this.getIntent().getIntExtra("categoryId", -1);
         if(categoryId > 0)
             categorySpinner.setSelection(categoryId-1);
+        Log.e(Constants.LOG_NAME, "Cat IDDD:"+categoryId+", sel:"+categorySpinner.getSelectedItem());
         transaction = (Transaction) this.getIntent().getSerializableExtra("transaction");
         if(transaction != null){
             amountEditBox.setText(Double.toString(Math.abs(transaction.getAmount())));
