@@ -7,6 +7,7 @@ import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.measureit.androet.db.Account;
 import org.measureit.androet.db.Category;
 
 /**
@@ -14,6 +15,8 @@ import org.measureit.androet.db.Category;
  * @author ezsi
  */
 public class Cache {
+    private static final Map<Integer, Account> ACCOUNT_CACHE = new HashMap<Integer, Account>();
+    
     private static final HashMap<Integer, Category> CATEGORY_CACHE = new HashMap<Integer, Category>();
     
     private static final List<Category> CATEGORY_LIST = new ArrayList<Category>();
@@ -48,6 +51,19 @@ public class Cache {
     "BWP", "XFU", "CLF", "ETB", "STD", "XXX", "XPD", "AMD", "XPF", "JMD",
     "MRO", "BIF", "CHW", "ZWL", "AWG", "MZN", "CHE", "XOF", "KZT", "BZD",
     "XAG", "KHR", "XAF", "GYD", "AFN", "SOS", "TOP", "AOA", "KPW" };
+    
+    public static Account getAccount(int id){
+        if(!ACCOUNT_CACHE.containsKey(id))
+            reloadAccountCache();
+        return ACCOUNT_CACHE.get(id);
+    }
+    
+    private static void reloadAccountCache(){
+        ACCOUNT_CACHE.clear();
+        List<Account> accounts = Account.list();
+        for(Account account : accounts)
+            ACCOUNT_CACHE.put(account.getId(), account);
+    }
     
     public static List<Category> getCategories(){
         if(CATEGORY_LIST.isEmpty())

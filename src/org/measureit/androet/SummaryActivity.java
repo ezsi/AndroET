@@ -6,15 +6,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
-import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -25,9 +20,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import org.measureit.androet.db.Account;
+import org.measureit.androet.db.CurrencyRate;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
+import org.measureit.androet.util.Cache;
 import org.measureit.androet.util.Constants;
 import org.measureit.androet.util.Helper;
 
@@ -67,10 +64,8 @@ public class SummaryActivity extends Activity {
                 Log.e(Constants.LOG_NAME, selectedTransaction.toString());
                 ActivitySwitch activitySwitch = ActivitySwitch.to(SummaryActivity.this, TransactionActivity.class)
                         .add("accountId", account.getId());
-                if(selectedTransaction.getCategory() != null){ // it's a real category and not a group
-                    Log.e(Constants.LOG_NAME, "Cat id: "+selectedTransaction.getCategory().getId());
+                if(selectedTransaction.getCategory() != null) // it's a real category and not a group
                     activitySwitch = activitySwitch.add("categoryId", selectedTransaction.getCategory().getId());
-                }
                 activitySwitch.execute();
                 return true;
             }
@@ -149,8 +144,9 @@ public class SummaryActivity extends Activity {
             row1.addView(TextViewBuilder.text(SummaryActivity.this, text).gravity(Gravity.BOTTOM)
                     .size(Constants.HEADER_TEXT_SIZE).color(textColor).build());
             
-            TextView amountTextView = TextViewBuilder.text(SummaryActivity.this, account.getCurrency().getSymbol()
-                    +" "+tr.getAmount()).size(Constants.TEXT_SIZE+2).color(textColor)
+            TextView amountTextView = TextViewBuilder.text(SummaryActivity.this, 
+                    String.format("%s %.2f", account.getCurrency().getSymbol(), tr.getAmount()))
+                    .size(Constants.TEXT_SIZE+2).color(textColor)
                     .gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).build();
             amountTextView.setLayoutParams(cellLp);
             row1.addView(amountTextView);

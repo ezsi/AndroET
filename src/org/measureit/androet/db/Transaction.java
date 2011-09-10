@@ -42,12 +42,13 @@ public class Transaction implements Serializable{
    
     public static final String VIEW_CREATE = 
             "CREATE VIEW " + VIEW_NAME 
-            + " AS SELECT *"
+            + " AS SELECT t.*, a.*"
             + ", CAST(strftime(\"%Y\", "+COL_DATE+", 'unixepoch') AS INTEGER) AS " + VIEW_COL_YEAR
             + ", CAST(strftime(\"%m\", "+COL_DATE+", 'unixepoch') AS INTEGER) AS " + VIEW_COL_MONTH
             + ", CAST(strftime(\"%W\", "+COL_DATE+", 'unixepoch') AS INTEGER) AS " + VIEW_COL_WEEK
             + ", CAST(strftime(\"%d\", "+COL_DATE+", 'unixepoch') AS INTEGER) AS " + VIEW_COL_DAY
-            + " FROM "+TABLE_NAME;
+            + " FROM "+TABLE_NAME+" AS t, "+Account.TABLE_NAME+" AS a"
+            + " WHERE t."+COL_ACCOUNT_ID + " = a." + Account.COL_ID;
     
     private int id;
     private int accountId;
@@ -181,14 +182,16 @@ public class Transaction implements Serializable{
             return cursor.getDouble(0);
         return -1;
     }
-
+    
     public static List<Transaction> sumByCategory(Account account){
         List<Transaction> transactions = new ArrayList<Transaction>();
         SQLiteDatabase db = DatabaseHelper.getInstance().getWritableDatabase();
         String commonSuffix = " GROUP BY t." + VIEW_COL_YEAR + ", t." + VIEW_COL_MONTH + ", t." + COL_CATEGORY_ID
                 + " ORDER by t." + VIEW_COL_YEAR + " DESC , t." + VIEW_COL_MONTH + " DESC, t." + COL_CATEGORY_ID;
-        Cursor cursor = db.rawQuery((account.isGroup()) ?
-            "SELECT t." + COL_CATEGORY_ID + ", sum(t." + COL_AMOUNT + "), t." + VIEW_COL_YEAR + ", t." + VIEW_COL_MONTH
+
+        final String sql = account.isGroup() ?
+            "SELECT t." + COL_CATEGORY_ID + ", " + getCurrencyConverterSql(account.getCurrency().getCurrencyCode()) 
+                + ", t." + VIEW_COL_YEAR + ", t." + VIEW_COL_MONTH
                 + " FROM "+ VIEW_NAME + " AS t," + Account.MAP_TABLE_NAME + " AS a"
                 + " WHERE t." + COL_ACCOUNT_ID + " = a." + Account.COL_MAP_ACCOUNT_ID 
                 + " AND a." + Account.COL_MAP_GROUP_ID + " = " + account.getId() 
@@ -197,25 +200,37 @@ public class Transaction implements Serializable{
             "SELECT t." + COL_CATEGORY_ID + ", sum(t." + COL_AMOUNT + "), t." + VIEW_COL_YEAR + ", t." + VIEW_COL_MONTH
                 + " FROM "+ VIEW_NAME + " AS t" 
                 + " WHERE t." + COL_ACCOUNT_ID + " = " + account.getId() 
-                + commonSuffix
-                , null);
+                + commonSuffix;
+        Cursor cursor = db.rawQuery(sql, null);
         while(cursor.moveToNext())
             transactions.add(new Transaction(-1, account.getId(), Cache.getCategory(cursor.getInt(0))
                     , cursor.getDouble(1), "", null, cursor.getInt(2), cursor.getInt(3)));
         return transactions;
     }
     
-    public static double sumGroup(int groupId){
-        Cursor cursor = DatabaseHelper.getInstance().getWritableDatabase().rawQuery(
-            "SELECT SUM(t." + COL_AMOUNT + ") FROM " + TABLE_NAME + " AS t," + Account.MAP_TABLE_NAME
-                + " AS a WHERE t." + COL_ACCOUNT_ID + " = a." + Account.COL_MAP_ACCOUNT_ID 
-                + " AND a." + Account.COL_MAP_GROUP_ID + " = " + groupId, null);
-        if(cursor.moveToFirst()) 
-            return cursor.getDouble(0);
-        return -1;
+    private static String getCurrencyConverterSql(String termCurrency){
+        return "SUM(CASE WHEN t.currency = '"+termCurrency+
+                "' THEN amount ELSE amount * (select rate from currencyrate where pair like t.currency || '"+termCurrency+"') END)";
     }
-
     
+
+    public static double sumGroup(Account group){
+        List<Account> accounts = Account.list(group.getId());
+        final String termCurrency = group.getCurrency().getCurrencyCode();
+        double sum = 0;
+        for(Account account : accounts){
+            String baseCurrency = account.getCurrency().getCurrencyCode();
+            if(baseCurrency.equals(termCurrency))
+                sum += account.getBalance();
+            else {
+                Double rate = CurrencyRate.getRate(baseCurrency+termCurrency);
+                if(rate != null)
+                    sum += (rate * account.getBalance());
+            }
+        }
+        return sum;
+    }
+        
     public static List<Transaction> list(Account account, int year, int month, int category_id){
         SQLiteDatabase db = DatabaseHelper.getInstance().getWritableDatabase();
         String commonCondition = 

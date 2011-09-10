@@ -57,7 +57,8 @@ public class Account implements Serializable{
         this.initialBalance = (group) ? sumInitialBalance(id) : initialBalance;
         this.budget = budget;
         this.currency = Cache.getCurrency(currencyCode);
-        this.balance = (group) ? this.initialBalance + Transaction.sumGroup(id) : this.initialBalance + Transaction.sum(id);
+//        this.balance = (group) ? this.initialBalance + Transaction.sumGroup(id) : this.initialBalance + Transaction.sum(id);
+        this.balance = this.initialBalance + Transaction.sum(id);
         this.group = group;
     }
 
@@ -87,7 +88,7 @@ public class Account implements Serializable{
     }
 
     public double getBalance() {
-        return balance;
+        return group ? Transaction.sumGroup(this) : balance;
     }
        
     public String getBalanceWithCurrency() {

@@ -31,8 +31,6 @@ import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 
-// TODO: add currency conversion
-//http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s=EURHUF=X%20EURUSD=X
 // TODO: add PIN protection
 
 public class AccountsActivity extends Activity{
@@ -174,9 +172,11 @@ public class AccountsActivity extends Activity{
             row1.setLayoutParams(rowParams);
             row1.addView(TextViewBuilder.text(AccountsActivity.this, account.getName())
                     .size(Constants.HEADER_TEXT_SIZE).color(textColor).build());
-            TextView amountTextView = TextViewBuilder.text(AccountsActivity.this, account.getCurrency().getSymbol()
-                    +" "+account.getBalance()).size(Constants.TEXT_SIZE+2)
-                    .gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).color(textColor).build();
+            
+            TextView amountTextView = TextViewBuilder.text(AccountsActivity.this, 
+                    String.format("%s %.2f", account.getCurrency().getSymbol(), account.getBalance()))
+                    .size(Constants.TEXT_SIZE+2).gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT)
+                    .color(textColor).build();
             amountTextView.setLayoutParams(cellParams);
             row1.addView(amountTextView);
 

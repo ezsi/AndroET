@@ -25,9 +25,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import org.measureit.androet.db.Account;
+import org.measureit.androet.db.CurrencyRate;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
+import org.measureit.androet.util.Cache;
 
 /**
  *
@@ -136,6 +138,7 @@ public class TransactionsActivity extends Activity {
             final TableLayout.LayoutParams rowParams = new TableLayout
                     .LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.FILL_PARENT);
             rowParams.setMargins(4, 2, 6, 2);
+          
             
             Transaction tr = items.get(position);
             TableLayout tableLayout = new TableLayout(TransactionsActivity.this);
@@ -150,8 +153,14 @@ public class TransactionsActivity extends Activity {
                     .gravity(Gravity.BOTTOM).size(Constants.HEADER_TEXT_SIZE)
                     .color(Constants.HEADER_TEXT_COLOR).build());
             
-            TextView amountTextView = TextViewBuilder.text(TransactionsActivity.this, account.getCurrency().getSymbol()
-                    +" "+tr.getAmount()).size(Constants.TEXT_SIZE+2)
+            double amount = tr.getAmount();
+            if(account.isGroup()){ // converting currency
+                String termCurrency = account.getCurrency().getCurrencyCode();
+                String baseCurrency = Cache.getAccount(tr.getAccountId()).getCurrency().getCurrencyCode();
+                if(!termCurrency.equals(baseCurrency))
+                    amount *= CurrencyRate.getRate(baseCurrency+termCurrency);
+            }
+            TextView amountTextView = TextViewBuilder.text(TransactionsActivity.this, String.format("%s %.2f", account.getCurrency().getSymbol(), amount)).size(Constants.TEXT_SIZE+2)
                     .color(Constants.HEADER_TEXT_COLOR).gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).build();
             amountTextView.setLayoutParams(cellLp);
             row1.addView(amountTextView);
