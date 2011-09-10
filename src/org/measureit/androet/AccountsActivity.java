@@ -1,5 +1,6 @@
 package org.measureit.androet;
 
+import android.app.Dialog;
 import org.measureit.androet.util.Constants;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -7,6 +8,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -18,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -26,13 +31,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import org.measureit.androet.db.Account;
 import org.measureit.androet.db.Backup;
-import org.measureit.androet.db.CurrencyRate;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Helper;
-
-// TODO: add PIN protection
 
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();
@@ -40,6 +42,10 @@ public class AccountsActivity extends Activity{
     private ArrayAdapter listAdapter;    
     private static Context context;
     private Account selectedAccount;
+    private EditText passwordEditBox; 
+    private static final int DIALOG_PASSWORD = 1;
+    private boolean authorized = false;
+    
     private DialogInterface.OnClickListener confirmDialogClickListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -51,7 +57,7 @@ public class AccountsActivity extends Activity{
             }
         }
     };
-    
+        
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -71,14 +77,50 @@ public class AccountsActivity extends Activity{
         listAdapter =  new AccountAdapter(this,android.R.layout.simple_list_item_1 , listItems);
         listView.setAdapter(listAdapter);
     }
-    
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);         
+        alertDialogBuilder.setTitle("Please enter PIN");  
+        passwordEditBox = new EditText(this);
+        passwordEditBox.setInputType(InputType.TYPE_CLASS_NUMBER);
+        passwordEditBox.setTransformationMethod(PasswordTransformationMethod.getInstance());
+        alertDialogBuilder.setView(passwordEditBox);
+        alertDialogBuilder.setCancelable(false); 
+        alertDialogBuilder.setPositiveButton(Constants.BUTTON_OK, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int width) {
+                removeDialog(DIALOG_PASSWORD);
+                String pin = PreferenceManager.getDefaultSharedPreferences(AccountsActivity.this).getString("pin", "");
+                if(!passwordEditBox.getText().toString().equals(pin))
+                    showDialog(DIALOG_PASSWORD);
+                else{
+                    authorized = true;
+                    refreshAccountList();
+                }
+            }
+        });
+        
+        alertDialogBuilder.setNegativeButton(Constants.BUTTON_CANCEL, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int width) {
+                AccountsActivity.this.finish();
+            }
+        });
+        return alertDialogBuilder.create();
+    }
+
     public static Context getAppContext(){
         return context;
     }
         
     @Override
     protected void onResume() {
-        refreshAccountList();
+        String pin = PreferenceManager.getDefaultSharedPreferences(this).getString("pin", "");
+        if(pin.isEmpty())
+            authorized = true;
+        if(authorized)
+            refreshAccountList();
+        else
+            showDialog(DIALOG_PASSWORD);
         super.onResume();
     }
 
@@ -97,8 +139,8 @@ public class AccountsActivity extends Activity{
             Backup.save();
         else if(Constants.ACCOUNT_LOAD_DB.equals(itemTitle))
             Backup.load();
-        else if(Constants.ACCOUNT_REFRESH_CURRENCY_RATES.equals(itemTitle))
-            CurrencyRate.download();
+        else if(Constants.ACCOUNT_SETTINGS.equals(itemTitle))
+            ActivitySwitch.to(this, Preferences.class).execute();
         
         return super.onOptionsItemSelected(item);
     }
@@ -108,6 +150,7 @@ public class AccountsActivity extends Activity{
         menu.add(Constants.ACCOUNT_SAVE_DB);
         menu.add(Constants.ACCOUNT_LOAD_DB);
         menu.add(Constants.ACCOUNT_REFRESH_CURRENCY_RATES);
+        menu.add(Constants.ACCOUNT_SETTINGS);
         return super.onCreateOptionsMenu(menu);
     }
 

@@ -13,7 +13,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--activity android:name="Preferences" android:label="Settings"/-->
+        <activity android:name="Preferences" android:label="Settings"/>
         <activity android:name="AccountActivity" android:label="Edit account"/>
         <activity android:name="TransferActivity" android:label="Transfer money"/>
         <activity android:name="GroupActivity" android:label="Edit group"/>
