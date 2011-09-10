@@ -30,6 +30,7 @@ import org.measureit.androet.db.CurrencyRate;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
+import org.measureit.androet.util.Helper;
 
 // TODO: add PIN protection
 
@@ -185,14 +186,14 @@ public class AccountsActivity extends Activity{
             double expense = Transaction.sum(account, Calendar.getInstance().get(Calendar.MONTH)+1);
             StringBuilder expenseSb = new StringBuilder();
             if(expense < 0)
-                expenseSb.append(Constants.ACCOUNT_EXPENSE).append(Double.toString(Math.abs(expense)));
+                expenseSb.append(Constants.ACCOUNT_EXPENSE).append(Helper.formatNumber(Math.abs(expense)));
             else if (expense > 0)
-                expenseSb.append(Constants.ACCOUNT_INCOME).append(Double.toString(Math.abs(expense)));
+                expenseSb.append(Constants.ACCOUNT_INCOME).append(Helper.formatNumber(Math.abs(expense)));
             
             int expenseColor = Constants.TEXT_COLOR;
             if(expense < 0 && account.getBudget() > 0){
                 double availableBudget = account.getBudget()+expense;
-                expenseSb.append(" / ").append(Double.toString(availableBudget));
+                expenseSb.append(" / ").append(Helper.formatNumber(availableBudget));
                 if(availableBudget < 0)
                     expenseColor = Constants.WARNING_COLOR;
             }

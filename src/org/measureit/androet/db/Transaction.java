@@ -163,20 +163,20 @@ public class Transaction implements Serializable{
      * Summarize transaction values for the current month (1-12).
      */
     public static double sum(Account account, int month){
-        Cursor cursor = account.isGroup() ? 
-            DatabaseHelper.getInstance().getWritableDatabase().rawQuery(
-                "SELECT SUM(t." + COL_AMOUNT + ") FROM " + VIEW_NAME + " AS t," + Account.MAP_TABLE_NAME
+        String sql = account.isGroup() ? 
+                "SELECT "+getCurrencyConverterSql(account.getCurrency().getCurrencyCode()) +" FROM " + VIEW_NAME + " AS t," + Account.MAP_TABLE_NAME
+//                "SELECT SUM(t." + COL_AMOUNT + ") FROM " + VIEW_NAME + " AS t," + Account.MAP_TABLE_NAME
                 + " AS a WHERE t." + COL_ACCOUNT_ID + " = a." + Account.COL_MAP_ACCOUNT_ID 
                 + " AND a." + Account.COL_MAP_GROUP_ID + " = " + account.getId() 
                 +" AND " + COL_AMOUNT + " < 0 " 
                 +" AND " + COL_CATEGORY_ID + " <> 24" /** OUT TRANSACTION is not expense **/
-                + " AND t." + VIEW_COL_MONTH + " = " + month, null)
-            : DatabaseHelper.getInstance().getWritableDatabase().rawQuery(
-                "SELECT SUM("+COL_AMOUNT+") FROM "+VIEW_NAME
+                + " AND t." + VIEW_COL_MONTH + " = " + month
+            : "SELECT SUM("+COL_AMOUNT+") FROM "+VIEW_NAME
                 +" WHERE "+COL_ACCOUNT_ID+"="+account.getId() 
                 +" AND " + COL_AMOUNT + " < 0 " 
                 +" AND " + COL_CATEGORY_ID + " <> 24" /** OUT TRANSACTION is not expense **/
-                +" AND " + VIEW_COL_MONTH + " = " + month, null);
+                +" AND " + VIEW_COL_MONTH + " = " + month;
+        Cursor cursor = DatabaseHelper.getInstance().getWritableDatabase().rawQuery(sql, null);
         
         if(cursor.moveToFirst()) 
             return cursor.getDouble(0);

@@ -19,6 +19,10 @@ public class Helper {
     public static int calendarToSeconds(Calendar calendar){
         return (int)(calendar.getTimeInMillis()/1000);
     }
+    
+    public static String formatNumber(double value){
+        return String.format("%.2f", value);
+    }
 
     /**
      * Resets the date, hour, minute, second values in a calendar object.
