@@ -20,11 +20,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import org.measureit.androet.db.Account;
-import org.measureit.androet.db.CurrencyRate;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
-import org.measureit.androet.util.Cache;
 import org.measureit.androet.util.Constants;
 import org.measureit.androet.util.Helper;
 
@@ -60,6 +58,8 @@ public class SummaryActivity extends Activity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if(account.isGroup())
+                    return true;
                 Transaction selectedTransaction = listItems.get(position);
                 Log.e(Constants.LOG_NAME, selectedTransaction.toString());
                 ActivitySwitch activitySwitch = ActivitySwitch.to(SummaryActivity.this, TransactionActivity.class)

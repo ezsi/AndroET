@@ -35,7 +35,7 @@ import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Helper;
-
+ 
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();
     private ListView listView;
@@ -100,7 +100,7 @@ public class AccountsActivity extends Activity{
             }
         });
         
-        alertDialogBuilder.setNegativeButton(Constants.BUTTON_CANCEL, new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setNegativeButton(Constants.BUTTON_EXIT, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int width) {
                 AccountsActivity.this.finish();
             }

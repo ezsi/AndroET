@@ -24,6 +24,8 @@ public interface Constants {
     static final String TRANSACTION_DELETE = "Delete transaction";
     static final String BUTTON_OK = "OK";
     static final String BUTTON_CANCEL = "Cancel";
+    static final String BUTTON_EXIT = "Exit";
+    
     static final int TEXT_SIZE = 12;
     static final int HEADER_TEXT_SIZE = 18;
     static final int HEADER_TEXT_COLOR = Color.DKGRAY;
