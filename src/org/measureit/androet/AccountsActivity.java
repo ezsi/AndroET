@@ -31,11 +31,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import org.measureit.androet.db.Account;
 import org.measureit.androet.db.Backup;
+import org.measureit.androet.db.CurrencyRate;
 import org.measureit.androet.db.Transaction;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Helper;
  
+//TODO: Replace application icon with a nice one. :)
+
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();
     private ListView listView;
@@ -141,6 +144,8 @@ public class AccountsActivity extends Activity{
             Backup.load();
         else if(Constants.ACCOUNT_SETTINGS.equals(itemTitle))
             ActivitySwitch.to(this, Preferences.class).execute();
+        else if(Constants.ACCOUNT_REFRESH_CURRENCY_RATES.equals(itemTitle))
+            CurrencyRate.download();
         
         return super.onOptionsItemSelected(item);
     }
