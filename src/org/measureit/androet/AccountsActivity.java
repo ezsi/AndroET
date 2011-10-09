@@ -124,7 +124,6 @@ public class AccountsActivity extends Activity{
         String pin = PreferenceManager.getDefaultSharedPreferences(this).getString("pin", "");
         if(pin.isEmpty())
             authorized = true;
-        authorized = true;
         if(authorized)
             refreshAccountList();
         else
