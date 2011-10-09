@@ -37,11 +37,9 @@ import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Helper;
  
-//TODO: Replace application icon with a nice one. :)
 //TODO: Summary: expense/income
 //TODO: replace account delete with disable
 //TODO: hidden status with ???
-//TODO: check access rights
 
 
 public class AccountsActivity extends Activity{
