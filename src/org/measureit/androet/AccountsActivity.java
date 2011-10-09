@@ -41,6 +41,7 @@ import org.measureit.androet.util.Helper;
 //TODO: Summary: expense/income
 //TODO: replace account delete with disable
 //TODO: hidden status with ???
+//TODO: check access rights
 
 
 public class AccountsActivity extends Activity{
@@ -69,6 +70,7 @@ public class AccountsActivity extends Activity{
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        setTitle("Accounts");
         context = getApplicationContext();
         listView = new ListView(this);
         listView.setBackgroundColor(Color.WHITE);
