@@ -105,14 +105,13 @@ public class TransferActivity extends Activity {
 
         amountEditBox = new EditText(this);
         amountEditBox.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Amount", amountEditBox) );
 
         accountSpinner = new Spinner(this);
-        
         accountAdapter = new ArrayAdapter<Account>(this,android.R.layout.simple_spinner_item , accounts);
         accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         accountSpinner.setAdapter(accountAdapter);
-        layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Destination account", accountSpinner) );
+
+        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createViewWithLabel(getBaseContext(), "Amount", amountEditBox), UIBuilder.createViewWithLabel(getBaseContext(), "Destination account", accountSpinner)));
         
         descriptionEditBox = new EditText(this);
         layout.addView( UIBuilder.createViewWithLabel(this, "Description", descriptionEditBox) );

@@ -2,17 +2,23 @@ package org.measureit.androet.db;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
+import android.text.format.DateFormat;
+import android.util.Log;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.measureit.androet.util.Constants;
 
 /**
  *
@@ -29,7 +35,10 @@ public class Backup {
             File dir = new File(root.getAbsolutePath() + "/AndroET");
             if(!dir.exists())
                 dir.mkdirs();
-            File file = new File(dir, "backup.db");
+            Calendar cal = Calendar.getInstance();
+            final String fileName = "backup"+cal.get(Calendar.YEAR)+"-"+(cal.get(Calendar.MONTH)+1)+"-"
+                    +cal.get(Calendar.DATE)+"-"+cal.get(Calendar.HOUR_OF_DAY)+"-"+cal.get(Calendar.MINUTE) +".db";
+            File file = new File(dir, fileName);
             out = new FileOutputStream(file);
             InputStream input = new FileInputStream("/data/data/org.measureit.androet/databases/androet");
             byte[] buffer = new byte[1024];

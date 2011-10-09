@@ -111,14 +111,14 @@ public class TransactionActivity extends Activity {
 
         amountEditBox = new EditText(this);
         amountEditBox.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        layout.addView( UIBuilder.createViewWithLabel(this, "Amount", amountEditBox) );
         
         categorySpinner = new Spinner(this);
         categoryAdapter = new ArrayAdapter<Category>(this,android.R.layout.simple_spinner_item , categoryItems);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(categoryAdapter);
-        layout.addView( UIBuilder.createViewWithLabel(this, "Category", categorySpinner) );
         
+        layout.addView(UIBuilder.createHorizontalView(this, UIBuilder.createViewWithLabel(this, "Amount", amountEditBox), UIBuilder.createViewWithLabel(this, "Category", categorySpinner)));
+
         descriptionEditBox = new EditText(this);
         layout.addView( UIBuilder.createViewWithLabel(this, "Description", descriptionEditBox) );
         

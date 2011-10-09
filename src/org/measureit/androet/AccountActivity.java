@@ -63,8 +63,14 @@ public class AccountActivity extends Activity {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         accountNameEditBox = new EditText(this);
-        layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Account name", accountNameEditBox) );
 
+        currencySpinner = new Spinner(this);
+        currencyAdapter = new ArrayAdapter<Currency>(this,android.R.layout.simple_spinner_item , currencies);
+        currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        currencySpinner.setAdapter(currencyAdapter);
+        
+        layout.addView(UIBuilder.createHorizontalView(this, UIBuilder.createViewWithLabel(getBaseContext(), "Account name", accountNameEditBox), UIBuilder.createViewWithLabel(getBaseContext(), "Currency", currencySpinner)));
+        
         initialBalanceEditBox = new EditText(this);
         initialBalanceEditBox.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Initial balance", initialBalanceEditBox) );
@@ -72,11 +78,6 @@ public class AccountActivity extends Activity {
         budgetEditBox.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Monthly budget", budgetEditBox) );
 
-        currencySpinner = new Spinner(this);
-        currencyAdapter = new ArrayAdapter<Currency>(this,android.R.layout.simple_spinner_item , currencies);
-        currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        currencySpinner.setAdapter(currencyAdapter);
-        layout.addView( UIBuilder.createViewWithLabel(getBaseContext(), "Currency", currencySpinner) );
         layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, Constants.BUTTON_OK, okOnClickListener), UIBuilder.createButton(this, Constants.BUTTON_CANCEL, cancelOnClickListener)));
 
         setContentView(layout);

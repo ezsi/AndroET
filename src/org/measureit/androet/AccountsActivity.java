@@ -38,6 +38,10 @@ import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Helper;
  
 //TODO: Replace application icon with a nice one. :)
+//TODO: Summary: expense/income
+//TODO: replace account delete with disable
+//TODO: hidden status with ???
+
 
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();
@@ -120,6 +124,7 @@ public class AccountsActivity extends Activity{
         String pin = PreferenceManager.getDefaultSharedPreferences(this).getString("pin", "");
         if(pin.isEmpty())
             authorized = true;
+        authorized = true;
         if(authorized)
             refreshAccountList();
         else
