@@ -41,10 +41,7 @@ import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Helper;
  
-//TODO: Summary: expense/income
-//TODO: horizontal swipe
 //TODO: test with different size config
-
 
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();

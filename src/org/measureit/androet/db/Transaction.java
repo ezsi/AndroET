@@ -124,6 +124,10 @@ public class Transaction implements Serializable{
         return year;
     }
     
+    public boolean isTransfer(){
+        return category.getId() == 24 || category.getId() == 25;
+    }
+    
     public static void insert(Transaction transaction) {
         insert(transaction.getAccountId(), transaction.getCategory().getId(), transaction.getAmount(), transaction.getDescription(), Helper.calendarToSeconds(transaction.getDate()));
     }

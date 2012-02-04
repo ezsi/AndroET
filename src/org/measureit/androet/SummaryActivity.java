@@ -25,6 +25,7 @@ import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Constants;
 import org.measureit.androet.util.Helper;
+import org.measureit.androet.util.SummaryTransaction;
 
 /**
  *
@@ -87,24 +88,38 @@ public class SummaryActivity extends Activity {
         List<Transaction> transactions = Transaction.sumByCategory(account);
         int year = 0;
         int month = 0;
-        Transaction groupTransaction = null;
-        double sum = 0;
+        SummaryTransaction summaryTransaction = null;
+        double expense = 0;
+        double income = 0;
+        
         for(Transaction tr : transactions){
             if(tr.getYear() != year || tr.getMonth() != month){
-                if(groupTransaction != null)
-                    groupTransaction.setAmount(sum);
-                sum = 0;
+                if(summaryTransaction != null)
+                    setSummary(summaryTransaction, expense, income);
+                expense = 0;
+                income = 0;
                 year = tr.getYear();
                 month = tr.getMonth();
-                groupTransaction = new Transaction(-1, tr.getAccountId(), null, 0, "", null, year, month);
-                listItems.add(groupTransaction);
+                summaryTransaction = new SummaryTransaction(tr.getAccountId(), year, month);
+                listItems.add(summaryTransaction);
             }
-            sum += tr.getAmount();
+            if(tr.isTransfer())
+                continue;
+            if(tr.getCategory().isExpense())
+                expense += tr.getAmount();
+            else
+                income += tr.getAmount();            
             listItems.add(tr);
         }
-        if(groupTransaction != null)
-            groupTransaction.setAmount(sum);
+        if(summaryTransaction != null)
+            setSummary(summaryTransaction, expense, income);
         listAdapter.notifyDataSetChanged();
+    }
+    
+    private void setSummary(SummaryTransaction summaryTransaction, double expense, double income){
+        summaryTransaction.setExpense(expense);
+        summaryTransaction.setIncome(income);
+        summaryTransaction.setAmount(income + expense);
     }
     
     private class TransactionAdapter extends ArrayAdapter<Transaction> {
@@ -120,7 +135,7 @@ public class SummaryActivity extends Activity {
         public View getView(int position, View convertView, ViewGroup parent) {
             final TableRow.LayoutParams cellLp = new TableRow.LayoutParams(
                     ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT, 1.0f);
-            cellLp.setMargins(2, 2, 2, 2);
+            cellLp.setMargins(2, 0, 2, 0);
             
             final TableLayout.LayoutParams rowParams = new TableLayout
                     .LayoutParams(TableLayout.LayoutParams.FILL_PARENT, TableLayout.LayoutParams.FILL_PARENT);
@@ -133,12 +148,27 @@ public class SummaryActivity extends Activity {
             row1.setLayoutParams(rowParams);
             String text = "";
             int textColor = Constants.HEADER_TEXT_COLOR;
-            if(tr.getCategory() == null){
+            TableRow row2 = new TableRow(SummaryActivity.this);
+            row2.setLayoutParams(rowParams);
+            if(tr instanceof SummaryTransaction){
+                SummaryTransaction summaryTransaction = (SummaryTransaction) tr;
                 Calendar date = Helper.resetDate(Calendar.getInstance());
                 date.set(Calendar.YEAR, tr.getYear());
                 date.set(Calendar.MONTH, tr.getMonth());
                 text = DateFormat.format("yyyy. MMMM ", date).toString(); 
                 textColor = Constants.HIGHLIGHT_COLOR;
+                TextView amountTextView = TextViewBuilder.text(SummaryActivity.this, 
+                    String.format("Expense: %s %.2f", account.getCurrency().getSymbol(), -1 * summaryTransaction.getExpense()))
+                    .size(Constants.TEXT_SIZE+2).color(textColor)
+                    .gravity(Gravity.CENTER_VERTICAL | Gravity.LEFT).build();
+                
+                row2.addView(amountTextView);
+                amountTextView = TextViewBuilder.text(SummaryActivity.this, 
+                    String.format("Income: %s %.2f", account.getCurrency().getSymbol(), summaryTransaction.getIncome()))
+                    .size(Constants.TEXT_SIZE+2).color(textColor)
+                    .gravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT).build();
+                amountTextView.setLayoutParams(cellLp);
+                row2.addView(amountTextView);
             }else
                 text = "  "+tr.getCategory().getName();
             row1.addView(TextViewBuilder.text(SummaryActivity.this, text).gravity(Gravity.BOTTOM)
@@ -151,10 +181,9 @@ public class SummaryActivity extends Activity {
             amountTextView.setLayoutParams(cellLp);
             row1.addView(amountTextView);
              
-            TableRow row2 = new TableRow(SummaryActivity.this);
-            row2.setLayoutParams(rowParams);
-            row2.addView(TextViewBuilder.text(SummaryActivity.this, "   "+tr.getDescription())
-                    .size(Constants.TEXT_SIZE).color(Color.LTGRAY).build());
+            
+//            row2.addView(TextViewBuilder.text(SummaryActivity.this, "   "+tr.getDescription())
+//                    .size(Constants.TEXT_SIZE).color(Color.LTGRAY).build());
             
             tableLayout.addView(row1);
             tableLayout.addView(row2);
