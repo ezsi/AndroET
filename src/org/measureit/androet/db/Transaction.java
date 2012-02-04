@@ -215,7 +215,7 @@ public class Transaction implements Serializable{
     
 
     public static double sumGroup(Account group){
-        List<Account> accounts = Account.list(group.getId());
+        List<Account> accounts = Account.list(group.getId(), null);
         final String termCurrency = group.getCurrency().getCurrencyCode();
         double sum = 0;
         for(Account account : accounts){

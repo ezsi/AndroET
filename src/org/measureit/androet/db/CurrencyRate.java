@@ -68,12 +68,12 @@ public class CurrencyRate {
     
     public static void download() {
         Set<String> currencyPairs = new HashSet<String>();
-        List<Account> accounts = Account.list();
+        List<Account> accounts = Account.list(true);
         for(Account account : accounts){
             if(!account.isGroup())
                 continue;
             String termCurrency = account.getCurrency().getCurrencyCode();
-            List<Account> groupAccounts = Account.list(account.getId());
+            List<Account> groupAccounts = Account.list(account.getId(), true);
             for(Account groupAccount : groupAccounts){
                 String baseCurrency = groupAccount.getCurrency().getCurrencyCode();
                 if(!baseCurrency.equals(termCurrency))

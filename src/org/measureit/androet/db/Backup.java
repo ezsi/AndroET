@@ -2,23 +2,18 @@ package org.measureit.androet.db;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
-import android.text.format.DateFormat;
-import android.util.Log;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.measureit.androet.util.Constants;
 
 /**
  *
@@ -66,7 +61,7 @@ public class Backup {
         
         File root = Environment.getExternalStorageDirectory();
         SQLiteDatabase db = SQLiteDatabase.openDatabase(root.getAbsolutePath() + "/AndroET/backup.db", null, 0);
-        List<Account> accounts = Account.list(db);
+        List<Account> accounts = Account.list(db, null);
         Map<Integer, Integer> accountIdMap = new HashMap<Integer, Integer>();
         for(Account account : accounts){
             Account.insert(account);
@@ -81,7 +76,7 @@ public class Backup {
             }
         }
         for(Account account : accounts){
-            List<Account> groupAccounts = Account.list(account.getId(), db);
+            List<Account> groupAccounts = Account.list(account.getId(), null, db);
             int accountId = accountIdMap.get(account.getId());
             for(Account groupAccount : groupAccounts){
                 Account.insertGroup(accountId, accountIdMap.get(groupAccount.getId()));

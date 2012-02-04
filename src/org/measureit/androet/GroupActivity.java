@@ -102,7 +102,7 @@ public class GroupActivity extends Activity {
     protected void onResume() {
         refreshCurrencyList();
         accountListItems.clear();
-        List<Account> accounts = Account.list();
+        List<Account> accounts = Account.list(true);
         for(Account acc : accounts)
             if(!acc.isGroup())
                 accountListItems.add(acc);
@@ -113,7 +113,7 @@ public class GroupActivity extends Activity {
             accountNameEditBox.setText(account.getName());
             currencySpinner.setSelection(currencies.indexOf(account.getCurrency()));
             budgetEditBox.setText(Double.toString(account.getBudget()));
-            List<Account> selectedAccounts = Account.list(account.getId());
+            List<Account> selectedAccounts = Account.list(account.getId(), true);
             for(Account selectedAccount : selectedAccounts)
                 accountListView.setItemChecked(accountListItems.indexOf(selectedAccount), true);
         }

@@ -21,7 +21,7 @@ public class UpdateBuilder {
     }
     
     public void update(){
-        DatabaseHelper.getInstance().getWritableDatabase().update(tableName, values, where, whereArgs);
+        DatabaseHelper.getInstance().getWritableDatabase().update(tableName, values, where, whereArgs);        
     }
     
     public UpdateBuilder where(String where, String ... whereArgs){

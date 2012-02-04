@@ -146,7 +146,7 @@ public class TransferActivity extends Activity {
     
     private void refreshAccountList(){
         accounts.clear();       
-        List<Account> allAccounts = Account.list();
+        List<Account> allAccounts = Account.list(true);
         for(Account acc : allAccounts){
             if(!acc.equals(account) && !acc.isGroup() 
                     && acc.getCurrency().equals(account.getCurrency()))

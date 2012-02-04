@@ -30,19 +30,19 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import org.measureit.androet.db.Account;
 import org.measureit.androet.db.Backup;
 import org.measureit.androet.db.CurrencyRate;
 import org.measureit.androet.db.Transaction;
+import org.measureit.androet.db.UpdateBuilder;
+import org.measureit.androet.db.WhereBuilder;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Helper;
  
 //TODO: Summary: expense/income
-//TODO: replace account delete with disable
-//TODO: hidden status with ???
 //TODO: horizontal swipe
-//TODO: Show/hide account
 //TODO: test with different size config
 
 
@@ -55,6 +55,7 @@ public class AccountsActivity extends Activity{
     private EditText passwordEditBox; 
     private static final int DIALOG_PASSWORD = 1;
     private boolean authorized = false;
+    private boolean showEnabledAccounts = true;
     
     private DialogInterface.OnClickListener confirmDialogClickListener = new DialogInterface.OnClickListener() {
         @Override
@@ -72,7 +73,6 @@ public class AccountsActivity extends Activity{
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setTitle("Accounts");
         context = getApplicationContext();
         listView = new ListView(this);
         listView.setBackgroundColor(Color.WHITE);
@@ -141,12 +141,18 @@ public class AccountsActivity extends Activity{
 
     private void refreshAccountList(){
         listItems.clear(); 
-        listItems.addAll(Account.list());
+        List<Account> accounts = Account.list(showEnabledAccounts);
+        if(accounts.isEmpty() && !showEnabledAccounts){ // if disabled list is empty we switch back to enabled accounts
+            showEnabledAccounts = true;
+            accounts = Account.list(showEnabledAccounts);
+        }
+        listItems.addAll(accounts);
         if(listItems.isEmpty())
             listItems.add(new Account(0, "Tap me long!", 0, 0, "EUR", false));
         listAdapter.notifyDataSetChanged();
+        setTitle( showEnabledAccounts ? "Accounts" : "Disabled accounts");
     }
-
+    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         final String itemTitle = item.toString();
@@ -196,19 +202,45 @@ public class AccountsActivity extends Activity{
             ActivitySwitch.to(AccountsActivity.this, TransferActivity.class).add("account", selectedAccount).execute();
         else if(Constants.ACCOUNT_CORRECT_BALANCE.equals(itemTitle)) 
             ActivitySwitch.to(AccountsActivity.this, CorrectBalanceActivity.class).add("account", selectedAccount).execute();
-        
+        else if(Constants.ACCOUNT_DISABLE.equals(itemTitle)) {
+            setEnabled(false);
+        } else if(Constants.ACCOUNT_ENABLE.equals(itemTitle)) {
+            setEnabled(true);
+        } else if(Constants.ACCOUNT_SHOW_ENABLED.equals(itemTitle)) {
+            showEnabledAccounts = true;
+            refreshAccountList();
+        } else if(Constants.ACCOUNT_SHOW_DISABLED.equals(itemTitle)) {
+            showEnabledAccounts = false;
+            refreshAccountList();
+        }
         return super.onContextItemSelected(item);
+    }
+    
+    private void setEnabled(Boolean enabled){
+        selectedAccount.setEnabled(enabled);
+        UpdateBuilder.table(Account.TABLE_NAME).column(Account.COL_ENABLED, enabled ? 1 : 0)
+                .where(WhereBuilder.get().where(Account.COL_ID).build(), 
+                Integer.toString(selectedAccount.getId())).update();
+        refreshAccountList();
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-        menu.add(Constants.TRANSACTION_ADD);
-        menu.add(Constants.ACCOUNT_CREATE);
-        menu.add(Constants.ACCOUNT_CREATE_GROUP);
+        if(showEnabledAccounts){
+            menu.add(Constants.TRANSACTION_ADD);
+            menu.add(Constants.ACCOUNT_TRANSFER_MONEY);
+            menu.add(Constants.ACCOUNT_CORRECT_BALANCE);
+            menu.add(Constants.ACCOUNT_CREATE);
+            menu.add(Constants.ACCOUNT_CREATE_GROUP);
+            menu.add(Constants.ACCOUNT_DISABLE); 
+            if(!Account.list(false).isEmpty())
+                menu.add(Constants.ACCOUNT_SHOW_DISABLED); 
+        }else {
+            menu.add(Constants.ACCOUNT_ENABLE); 
+            menu.add(Constants.ACCOUNT_SHOW_ENABLED); 
+        }
         menu.add(Constants.ACCOUNT_EDIT);        
-        menu.add(Constants.ACCOUNT_DELETE);
-        menu.add(Constants.ACCOUNT_TRANSFER_MONEY);
-        menu.add(Constants.ACCOUNT_CORRECT_BALANCE);
+        menu.add(Constants.ACCOUNT_DELETE);        
         super.onCreateContextMenu(menu, v, menuInfo);
     }
     

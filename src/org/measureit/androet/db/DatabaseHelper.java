@@ -13,7 +13,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper instance;
     private static final String DATABASE_NAME = "androet";
-    public static final int DATABASE_VERSION = 34; 
+    public static final int DATABASE_VERSION = 36; 
     
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

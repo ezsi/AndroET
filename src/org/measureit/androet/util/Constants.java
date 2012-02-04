@@ -14,6 +14,10 @@ public interface Constants {
     static final String ACCOUNT_CREATE_GROUP = "New group";
     static final String ACCOUNT_CREATE = "New account";
     static final String ACCOUNT_EDIT = "Edit account";
+    static final String ACCOUNT_DISABLE = "Disable account";
+    static final String ACCOUNT_SHOW_DISABLED = "Show disabled accounts";
+    static final String ACCOUNT_ENABLE = "Enable account";
+    static final String ACCOUNT_SHOW_ENABLED = "Show enabled accounts";
     static final String ACCOUNT_DELETE = "Delete account";
     static final String ACCOUNT_TRANSFER_MONEY = "Transfer money";
     static final String ACCOUNT_SETTINGS = "Settings";

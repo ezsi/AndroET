@@ -60,7 +60,7 @@ public class Cache {
     
     private static void reloadAccountCache(){
         ACCOUNT_CACHE.clear();
-        List<Account> accounts = Account.list();
+        List<Account> accounts = Account.list(null);
         for(Account account : accounts)
             ACCOUNT_CACHE.put(account.getId(), account);
     }
