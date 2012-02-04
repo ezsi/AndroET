@@ -103,12 +103,12 @@ public class SummaryActivity extends Activity {
                 summaryTransaction = new SummaryTransaction(tr.getAccountId(), year, month);
                 listItems.add(summaryTransaction);
             }
-            if(tr.isTransfer())
-                continue;
-            if(tr.getCategory().isExpense())
-                expense += tr.getAmount();
-            else
-                income += tr.getAmount();            
+            if(!tr.isTransfer()){
+                if(tr.getCategory().isExpense())
+                    expense += tr.getAmount();
+                else
+                    income += tr.getAmount();            
+            }
             listItems.add(tr);
         }
         if(summaryTransaction != null)
