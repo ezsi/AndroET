@@ -117,7 +117,9 @@ public class TransactionActivity extends Activity {
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(categoryAdapter);
         
-        layout.addView(UIBuilder.createHorizontalView(this, UIBuilder.createViewWithLabel(this, "Amount", amountEditBox), UIBuilder.createViewWithLabel(this, "Category", categorySpinner)));
+        layout.addView(UIBuilder.createHorizontalView(this, 
+                UIBuilder.createViewWithLabel(this, "Amount", amountEditBox), 
+                UIBuilder.createViewWithLabel(this, "Category", categorySpinner)));
 
         descriptionEditBox = new EditText(this);
         layout.addView( UIBuilder.createViewWithLabel(this, "Description", descriptionEditBox) );
@@ -145,7 +147,6 @@ public class TransactionActivity extends Activity {
         int categoryId = this.getIntent().getIntExtra("categoryId", -1);
         if(categoryId > 0)
             categorySpinner.setSelection(categoryId-1);
-        Log.e(Constants.LOG_NAME, "Cat IDDD:"+categoryId+", sel:"+categorySpinner.getSelectedItem());
         transaction = (Transaction) this.getIntent().getSerializableExtra("transaction");
         if(transaction != null){
             amountEditBox.setText(Double.toString(Math.abs(transaction.getAmount())));

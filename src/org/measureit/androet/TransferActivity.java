@@ -41,6 +41,7 @@ public class TransferActivity extends Activity {
     private Button dateButton;
     private Button timeButton;
     private Calendar calendar;
+    
     private OnClickListener okOnClickListener = new OnClickListener() {
         public void onClick(View arg0) {
             Account selectedAccount = (Account)accountSpinner.getSelectedItem();
@@ -111,7 +112,9 @@ public class TransferActivity extends Activity {
         accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         accountSpinner.setAdapter(accountAdapter);
 
-        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createViewWithLabel(getBaseContext(), "Amount", amountEditBox), UIBuilder.createViewWithLabel(getBaseContext(), "Destination account", accountSpinner)));
+        layout.addView( UIBuilder.createHorizontalView(this, 
+                UIBuilder.createViewWithLabel(getBaseContext(), "Amount", amountEditBox), 
+                UIBuilder.createViewWithLabel(getBaseContext(), "Destination account", accountSpinner)));
         
         descriptionEditBox = new EditText(this);
         layout.addView( UIBuilder.createViewWithLabel(this, "Description", descriptionEditBox) );
@@ -127,7 +130,9 @@ public class TransferActivity extends Activity {
         timeButton.setOnClickListener(timeOnClickListener);
         LinearLayout timeView = UIBuilder.createViewWithLabel(this, "Time", timeButton);
         layout.addView( UIBuilder.createHorizontalView(this, dateView, timeView));
-        layout.addView( UIBuilder.createHorizontalView(this, UIBuilder.createButton(this, Constants.BUTTON_OK, okOnClickListener), UIBuilder.createButton(this, Constants.BUTTON_CANCEL, cancelOnClickListener)));
+        layout.addView( UIBuilder.createHorizontalView(this, 
+                UIBuilder.createButton(this, Constants.BUTTON_OK, okOnClickListener), 
+                UIBuilder.createButton(this, Constants.BUTTON_CANCEL, cancelOnClickListener)));
 
         setContentView(layout);
     }

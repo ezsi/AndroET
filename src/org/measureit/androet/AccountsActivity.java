@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -40,6 +41,10 @@ import org.measureit.androet.util.Helper;
 //TODO: Summary: expense/income
 //TODO: replace account delete with disable
 //TODO: hidden status with ???
+//TODO: horizontal swipe
+//TODO: Correct balance
+//TODO: Show/hide account
+//TODO: test with different size config
 
 
 public class AccountsActivity extends Activity{
@@ -93,7 +98,7 @@ public class AccountsActivity extends Activity{
         passwordEditBox.setInputType(InputType.TYPE_CLASS_NUMBER);
         passwordEditBox.setTransformationMethod(PasswordTransformationMethod.getInstance());
         alertDialogBuilder.setView(passwordEditBox);
-        alertDialogBuilder.setCancelable(false); 
+        alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setPositiveButton(Constants.BUTTON_OK, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int width) {
                 removeDialog(DIALOG_PASSWORD);
@@ -112,7 +117,10 @@ public class AccountsActivity extends Activity{
                 AccountsActivity.this.finish();
             }
         });
-        return alertDialogBuilder.create();
+        
+        AlertDialog dialog = alertDialogBuilder.create();
+        dialog.getWindow().setSoftInputMode( WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        return dialog;
     }
 
     public static Context getAppContext(){
@@ -126,7 +134,7 @@ public class AccountsActivity extends Activity{
             authorized = true;
         if(authorized)
             refreshAccountList();
-        else
+        else 
             showDialog(DIALOG_PASSWORD);
         super.onResume();
     }
