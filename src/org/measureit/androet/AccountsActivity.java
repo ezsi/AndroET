@@ -42,7 +42,6 @@ import org.measureit.androet.util.Helper;
 //TODO: replace account delete with disable
 //TODO: hidden status with ???
 //TODO: horizontal swipe
-//TODO: Correct balance
 //TODO: Show/hide account
 //TODO: test with different size config
 
@@ -132,6 +131,7 @@ public class AccountsActivity extends Activity{
         String pin = PreferenceManager.getDefaultSharedPreferences(this).getString("pin", "");
         if(pin.isEmpty())
             authorized = true;
+        authorized = true;
         if(authorized)
             refreshAccountList();
         else 
@@ -194,6 +194,9 @@ public class AccountsActivity extends Activity{
                 .setNegativeButton("No", confirmDialogClickListener).show();
         }else if(Constants.ACCOUNT_TRANSFER_MONEY.equals(itemTitle))
             ActivitySwitch.to(AccountsActivity.this, TransferActivity.class).add("account", selectedAccount).execute();
+        else if(Constants.ACCOUNT_CORRECT_BALANCE.equals(itemTitle)) 
+            ActivitySwitch.to(AccountsActivity.this, CorrectBalanceActivity.class).add("account", selectedAccount).execute();
+        
         return super.onContextItemSelected(item);
     }
 
@@ -205,6 +208,7 @@ public class AccountsActivity extends Activity{
         menu.add(Constants.ACCOUNT_EDIT);        
         menu.add(Constants.ACCOUNT_DELETE);
         menu.add(Constants.ACCOUNT_TRANSFER_MONEY);
+        menu.add(Constants.ACCOUNT_CORRECT_BALANCE);
         super.onCreateContextMenu(menu, v, menuInfo);
     }
     

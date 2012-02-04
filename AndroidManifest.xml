@@ -20,5 +20,6 @@
         <activity android:name="TransactionsActivity" android:label="Transactions"/>
         <activity android:name="SummaryActivity" android:label="Account summary"/>
         <activity android:name="TransactionActivity" android:windowSoftInputMode="stateAlwaysVisible" android:label="Edit transaction"/>
+        <activity android:name="CorrectBalanceActivity" android:windowSoftInputMode="stateAlwaysVisible" android:label="Correct account balance"/>
     </application>
 </manifest> 
