@@ -47,7 +47,7 @@ public class CurrencyRate {
     
     public static void insertOrUpdate(String pair, double rate) {
         final SQLiteDatabase db = DatabaseHelper.getInstance().getWritableDatabase();
-        if(getRate(pair) != null){ // update rate
+        if(getRate(pair) != 0D){ // update rate
             UpdateBuilder.table(TABLE_NAME)
                     .column(COL_RATE, rate)
                     .where(WhereBuilder.get().where(COL_PAIR).build(), pair)
@@ -63,7 +63,7 @@ public class CurrencyRate {
     public static Double getRate(String pair){
         Cursor cursor = DatabaseHelper.getInstance().getWritableDatabase()
                 .query(TABLE_NAME, null, COL_PAIR+" = \""+pair +"\"", null, null, null, null);
-        return cursor.moveToNext() ? cursor.getDouble(1) : null;
+        return cursor.moveToNext() ? cursor.getDouble(1) : 0D;
     }
     
     public static void download() {
@@ -85,7 +85,7 @@ public class CurrencyRate {
         StringBuilder urlString = new StringBuilder("http://finance.yahoo.com/d/quotes.csv?e=.csv&f=sl1d1t1&s=");
         for(String currencyPair : currencyPairs)
             urlString.append(currencyPair).append("=X%20");
-        
+        Log.e(Constants.LOG_NAME, "URL: "+urlString.toString());
         BufferedReader br = null;
         try {
             URL url = new URL(urlString.toString());

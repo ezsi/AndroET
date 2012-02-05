@@ -3,13 +3,11 @@ package org.measureit.androet.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import org.measureit.androet.util.Cache;
-import org.measureit.androet.util.Constants;
 
 /**
  *

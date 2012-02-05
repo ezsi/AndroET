@@ -44,11 +44,6 @@ import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Helper;
 import org.measureit.androet.util.ProgressTask;
  
-//TODO: test with different size config
-
-//TODO: rate access exception
-//TODO: rate download exception
-
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();
     private ListView listView;
@@ -247,40 +242,16 @@ public class AccountsActivity extends Activity{
         super.onCreateContextMenu(menu, v, menuInfo);
     }
     
-    private void runDialog(final int seconds)
-
-{
-        Log.e(Constants.LOG_NAME, "rundialog");
-        final ProgressDialog progressDialog = ProgressDialog.show(this, "Please wait....", "Here your message");
-
- 
-        Log.e(Constants.LOG_NAME, "dialog shown");
-        new Thread(new Runnable(){
-            public void run(){
-                try {
-                    Log.e(Constants.LOG_NAME, "start thread");
-                    Thread.sleep(seconds * 1000);
-                    Log.e(Constants.LOG_NAME, "done thread");
-                    progressDialog.dismiss();
-                    Log.e(Constants.LOG_NAME, "dismiss");
-
-                } catch (InterruptedException e) {
-
-                   e.printStackTrace();
-
-                }
-
-            }
-
-        }).start();
-        Log.e(Constants.LOG_NAME, "start done");
-}
-
-    
     private class DownloadRatesProgressTask extends ProgressTask {
 
         public DownloadRatesProgressTask() {
             super(AccountsActivity.this, "Updating currency rates.");
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            AccountsActivity.this.refreshAccountList();
         }
         
         @Override
@@ -291,10 +262,12 @@ public class AccountsActivity extends Activity{
         
     }
     
+    
+    
     private class SaveDatabaseProgressTask extends ProgressTask {
 
         public SaveDatabaseProgressTask() {
-            super(AccountsActivity.this, "Saving database ...");
+            super(AccountsActivity.this, "Saving database.");
         }
         
         @Override
@@ -308,9 +281,15 @@ public class AccountsActivity extends Activity{
     private class LoadDatabaseProgressTask extends ProgressTask {
 
         public LoadDatabaseProgressTask() {
-            super(AccountsActivity.this, "Loading database ...");
+            super(AccountsActivity.this, "Loading database.");
         }
-        
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            AccountsActivity.this.refreshAccountList();
+        }
+
         @Override
         protected Boolean doInBackground(String... arg0) {
             Backup.load();
