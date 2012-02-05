@@ -4,6 +4,7 @@ import android.app.Dialog;
 import org.measureit.androet.util.Constants;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -40,8 +42,12 @@ import org.measureit.androet.db.WhereBuilder;
 import org.measureit.androet.ui.ActivitySwitch;
 import org.measureit.androet.ui.TextViewBuilder;
 import org.measureit.androet.util.Helper;
+import org.measureit.androet.util.ProgressTask;
  
 //TODO: test with different size config
+
+//TODO: rate access exception
+//TODO: rate download exception
 
 public class AccountsActivity extends Activity{
     private final ArrayList<Account> listItems = new ArrayList<Account>();
@@ -153,13 +159,14 @@ public class AccountsActivity extends Activity{
     public boolean onOptionsItemSelected(MenuItem item) {
         final String itemTitle = item.toString();
         if(Constants.ACCOUNT_SAVE_DB.equals(itemTitle))
-            Backup.save();
+            new SaveDatabaseProgressTask().execute();
         else if(Constants.ACCOUNT_LOAD_DB.equals(itemTitle))
-            Backup.load();
+            new LoadDatabaseProgressTask().execute();
         else if(Constants.ACCOUNT_SETTINGS.equals(itemTitle))
             ActivitySwitch.to(this, Preferences.class).execute();
-        else if(Constants.ACCOUNT_REFRESH_CURRENCY_RATES.equals(itemTitle))
-            CurrencyRate.download();
+        else if(Constants.ACCOUNT_REFRESH_CURRENCY_RATES.equals(itemTitle)){
+            new DownloadRatesProgressTask().execute();
+        }
         
         return super.onOptionsItemSelected(item);
     }
@@ -240,6 +247,77 @@ public class AccountsActivity extends Activity{
         super.onCreateContextMenu(menu, v, menuInfo);
     }
     
+    private void runDialog(final int seconds)
+
+{
+        Log.e(Constants.LOG_NAME, "rundialog");
+        final ProgressDialog progressDialog = ProgressDialog.show(this, "Please wait....", "Here your message");
+
+ 
+        Log.e(Constants.LOG_NAME, "dialog shown");
+        new Thread(new Runnable(){
+            public void run(){
+                try {
+                    Log.e(Constants.LOG_NAME, "start thread");
+                    Thread.sleep(seconds * 1000);
+                    Log.e(Constants.LOG_NAME, "done thread");
+                    progressDialog.dismiss();
+                    Log.e(Constants.LOG_NAME, "dismiss");
+
+                } catch (InterruptedException e) {
+
+                   e.printStackTrace();
+
+                }
+
+            }
+
+        }).start();
+        Log.e(Constants.LOG_NAME, "start done");
+}
+
+    
+    private class DownloadRatesProgressTask extends ProgressTask {
+
+        public DownloadRatesProgressTask() {
+            super(AccountsActivity.this, "Updating currency rates.");
+        }
+        
+        @Override
+        protected Boolean doInBackground(String... arg0) {
+            CurrencyRate.download();
+            return true;
+        }
+        
+    }
+    
+    private class SaveDatabaseProgressTask extends ProgressTask {
+
+        public SaveDatabaseProgressTask() {
+            super(AccountsActivity.this, "Saving database ...");
+        }
+        
+        @Override
+        protected Boolean doInBackground(String... arg0) {
+            Backup.save();
+            return true;
+        }
+        
+    }
+    
+    private class LoadDatabaseProgressTask extends ProgressTask {
+
+        public LoadDatabaseProgressTask() {
+            super(AccountsActivity.this, "Loading database ...");
+        }
+        
+        @Override
+        protected Boolean doInBackground(String... arg0) {
+            Backup.load();
+            return true;
+        }
+        
+    }
     
     private class AccountAdapter extends ArrayAdapter<Account> {
         private ArrayList<Account> items;

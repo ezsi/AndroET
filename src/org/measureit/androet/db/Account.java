@@ -199,7 +199,6 @@ public class Account implements Serializable{
         }
         Cursor cursor = db.query(TABLE_NAME, null, whereClause, whereArgs, 
                 null, null, COL_CURRENCY + "," + COL_GROUP + ","+COL_NAME);
-        Log.e(Constants.LOG_NAME, "cursor: "+cursor.getCount());
         while(cursor.moveToNext()) 
             accounts.add(readAccount(cursor));
         return accounts;
